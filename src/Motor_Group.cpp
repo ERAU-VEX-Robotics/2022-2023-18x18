@@ -1,5 +1,4 @@
 #include "Motor_Group.hpp"
-#include "pros/motors.h"
 
 /* The Constructors for Motor_Group*/
 
