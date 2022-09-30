@@ -26,14 +26,6 @@ class Drivetrain {
 
     void tank_driver(pros::controller_id_e_t controller);
     void arcade_driver(pros::controller_id_e_t controller);
-
-    void print_left_current_draws();
-
-    void print_right_current_draws();
-
-    void print_left_voltages();
-
-    void print_right_voltages();
 };
 
 #endif /* Drivetrain.hpp */

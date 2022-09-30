@@ -1,5 +1,6 @@
 #include "Drivetrain.hpp"
 #include "pros/misc.h"
+#include <sys/types.h>
 
 Drivetrain::Drivetrain(std::initializer_list<int> left_ports,
                        std::initializer_list<int> right_ports,
@@ -16,28 +17,4 @@ void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
         controller, pros::E_CONTROLLER_ANALOG_LEFT_Y));
     right_motors.move(pros::c::controller_get_analog(
         controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
-}
-
-void Drivetrain::print_left_current_draws() {
-    for (int draw : left_motors.get_current_draws())
-        printf("%d ", draw);
-    printf("\n");
-}
-
-void Drivetrain::print_right_current_draws() {
-    for (int draw : right_motors.get_current_draws())
-        printf("%d ", draw);
-    printf("\n");
-}
-
-void Drivetrain::print_left_voltages() {
-    for (int voltage : left_motors.get_voltages())
-        printf("%d ", voltage);
-    printf("\n");
-}
-
-void Drivetrain::print_right_voltages() {
-    for (int voltage : right_motors.get_voltages())
-        printf("%d ", voltage);
-    printf("\n");
 }
