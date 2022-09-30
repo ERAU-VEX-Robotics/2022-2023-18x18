@@ -33,7 +33,7 @@ class Motor_Group {
      * the program is running. While motorPorts is already private, it is
      * also declared as a const for the sake of emphasis
      */
-    std::vector<int> motorPorts;
+    std::vector<int> motor_ports;
 
   public:
     /**

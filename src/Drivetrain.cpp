@@ -1,11 +1,12 @@
 #include "Drivetrain.hpp"
 #include "pros/misc.h"
 
-Drivetrain::Drivetrain(std::initializer_list<int> leftPorts,
-                       std::initializer_list<int> rightPorts,
-                       std::initializer_list<bool> leftRevs,
-                       std::initializer_list<bool> rightRevs)
-    : left_motors(leftPorts, leftRevs), right_motors(rightPorts, rightRevs) {
+Drivetrain::Drivetrain(std::initializer_list<int> left_ports,
+                       std::initializer_list<int> right_ports,
+                       std::initializer_list<bool> left_revs,
+                       std::initializer_list<bool> right_revs)
+    : left_motors(left_ports, left_revs),
+      right_motors(right_ports, right_revs) {
     left_motors.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
     right_motors.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
 }

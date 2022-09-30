@@ -19,10 +19,10 @@ class Drivetrain {
     Motor_Group left_motors, right_motors;
 
   public:
-    Drivetrain(std::initializer_list<int> leftPorts,
-               std::initializer_list<int> rightPorts,
-               std::initializer_list<bool> leftRevs,
-               std::initializer_list<bool> rightBools);
+    Drivetrain(std::initializer_list<int> left_ports,
+               std::initializer_list<int> right_ports,
+               std::initializer_list<bool> left_revs,
+               std::initializer_list<bool> right_revs);
 
     void tank_driver(pros::controller_id_e_t controller);
     void arcade_driver(pros::controller_id_e_t controller);
