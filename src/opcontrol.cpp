@@ -23,7 +23,7 @@ void opcontrol() {
         drive.print_right_current_draws();
         drive.print_left_voltages();
         drive.print_right_voltages();
-        pros::delay(200);
+        pros::delay(20);
         printf("loop\n");
     }
 }
