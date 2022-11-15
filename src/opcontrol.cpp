@@ -1,3 +1,4 @@
+#include "Motor_Group.hpp"
 #include "main.h"
 #include "pros/misc.h"
 #include "pros/rtos.hpp"
@@ -19,11 +20,9 @@ void opcontrol() {
 
     while (true) {
         drive.tank_driver(pros::E_CONTROLLER_MASTER);
-        drive.print_left_current_draws();
-        drive.print_right_current_draws();
-        drive.print_left_voltages();
-        drive.print_right_voltages();
+        drive.print_telemetry(0, E_MOTOR_GROUP_TELEM_PRINT_CURRENT |
+                                     E_MOTOR_GROUP_TELEM_PRINT_VELOCITY |
+                                     E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE);
         pros::delay(20);
-        printf("loop\n");
     }
 }
