@@ -1,4 +1,5 @@
 #include "Motor_Group.hpp"
+#include <vector>
 
 /* The Constructors for Motor_Group*/
 
@@ -295,4 +296,50 @@ void Motor_Group::set_zero_position(double zero_pos) {
 void Motor_Group::reset_positions(void) {
     for (int p : motor_ports)
         pros::c::motor_tare_position(p);
+}
+
+/* Miscellaneous Functions */
+void Motor_Group::print_telemetry(uint8_t vals_to_print) {
+    if (vals_to_print & E_MOTOR_GROUP_TELEM_PRINT_VELOCITY) {
+        printf("Velocities: ");
+        std::vector<double> velos = get_velocities();
+        for (double d : velos)
+            printf("%.2lf ", d);
+        printf("\n");
+    }
+    if (vals_to_print & E_MOTOR_GROUP_TELEM_PRINT_POSITION) {
+        printf("Positions: ");
+        std::vector<double> poses = get_positions();
+        for (double d : poses)
+            printf("%.2lf ", d);
+        printf("\n");
+    }
+    if (vals_to_print & E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE) {
+        printf("Voltages: ");
+        std::vector<int> voltages = get_voltages();
+        for (int i : voltages)
+            printf("%d ", i);
+        printf("\n");
+    }
+    if (vals_to_print & E_MOTOR_GROUP_TELEM_PRINT_CURRENT) {
+        printf("Current Draws: ");
+        std::vector<int> currents = get_current_draws();
+        for (int i : currents)
+            printf("%d ", i);
+        printf("\n");
+    }
+    if (vals_to_print & E_MOTOR_GROUP_TELEM_PRINT_TEMPERATURE) {
+        printf("Temperatures: ");
+        std::vector<double> temps = get_temperatures();
+        for (double d : temps)
+            printf("%.2lf ", d);
+        printf("\n");
+    }
+    if (vals_to_print & E_MOTOR_GROUP_TELEM_PRINT_TORQUE) {
+        printf("Torques: ");
+        std::vector<double> torques = get_torques();
+        for (double d : torques)
+            printf("%.2lf ", d);
+        printf("\n");
+    }
 }

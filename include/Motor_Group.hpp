@@ -251,7 +251,8 @@ class Motor_Group {
      * the negative direction. In theory, the directions for each motor should
      * all be the same
      *
-     * @returns A vector containing the current directions for each motor
+     * @returns A vector containing the current directions for each motor i.e.
+     *          whether each motor is reversed
      */
     std::vector<int> get_directions(void);
 
@@ -492,6 +493,33 @@ class Motor_Group {
      * It calls the PROS motor_tare_position function on each motor.
      */
     void reset_positions(void);
+
+    /**------------------------
+     * Miscellaneous Functions
+     *-------------------------*/
+    /**
+     * Prints telemetry values to stdio (viewable with the PROS terminal)
+     * Use the motor_group_telem_print_e enumerated type to select
+     * which values to print
+     *
+     * @param vals_to_print A bitfield specifiying which values to print
+     *        Based on the motor_group_telem_print_e enumerated type
+     */
+    void print_telemetry(uint8_t vals_to_print);
 };
+
+/**
+ * Enumerated Type used to specify which values to print when calling
+ * print_telemetry()
+ */
+typedef enum motor_group_telem_print_e {
+    E_MOTOR_GROUP_TELEM_PRINT_NONE = 0x00,
+    E_MOTOR_GROUP_TELEM_PRINT_VELOCITY = 0x01,
+    E_MOTOR_GROUP_TELEM_PRINT_POSITION = 0x02,
+    E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE = 0x04,
+    E_MOTOR_GROUP_TELEM_PRINT_CURRENT = 0x08,
+    E_MOTOR_GROUP_TELEM_PRINT_TEMPERATURE = 0x10,
+    E_MOTOR_GROUP_TELEM_PRINT_TORQUE = 0x20,
+} motor_group_telem_print_e_t;
 
 #endif /* Motor_Group.hpp */
