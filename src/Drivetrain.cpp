@@ -18,3 +18,15 @@ void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
     right_motors.move(pros::c::controller_get_analog(
         controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 }
+
+void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {
+    if (left_vals) {
+        printf("Left Motor Telemetry\n");
+        left_motors.print_telemetry(left_vals);
+    }
+    printf("\n");
+    if (right_vals) {
+        printf("Right Motor Telemetry\n");
+        right_motors.print_telemetry(right_vals);
+    }
+}
