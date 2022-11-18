@@ -3,6 +3,7 @@
 Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
                  {true, false, true, false, true},
                  {false, true, false, true, false});
+Intake intake({3, 4}, {false, false});
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
