@@ -21,20 +21,28 @@ class Intake {
      * The Constructor for the Intake Class
      *
      * \param ports A list of ports used by motors on the intake
-     * \param revs A list of booleans specifying which motors are reversed
+     * \param reverses A list of booleans specifying which motors are reversed
      *             Each element in the list corresponds to the respective
      *             element in ports, i.e. whether or not the motor in the port
      *             specified in the third index of ports is determined by the
      *             third index of revs.
      */
-    Intake(std::initializer_list<int> ports, std::initializer_list<bool> revs);
+    Intake(std::initializer_list<int> ports,
+           std::initializer_list<bool> reverses);
 
     /**
      * Function: driver
      *
      * The function used to control the intake in driver control
+     * \param controller The controller ID whose buttons to read
+     * \param in_button The digital button ID to press to run the motors to
+     *                  collect disks
+     * \param out_button The digital button ID to press to run the motors to
+     *                   expel disks
      */
-    void driver(pros::controller_id_e_t controller);
+    void driver(pros::controller_id_e_t controller,
+                pros::controller_digital_e_t in_button,
+                pros::controller_digital_e_t out_button);
 
     // Wraps the necessary code to run the motors to collect disks
     void in();
@@ -53,3 +61,4 @@ class Intake {
      */
     void print_telemetry(uint8_t vals_to_print);
 };
+#endif /* intake.hpp */
