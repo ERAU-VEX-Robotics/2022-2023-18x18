@@ -9,6 +9,7 @@
  * disks
  */
 #include "Motor_Group.hpp"
+#include "pros/misc.h"
 #include <initializer_list>
 
 class Flywheel {
@@ -31,20 +32,21 @@ class Flywheel {
              std::initializer_list<bool> reverses);
 
     /**
-     * Function: set_velocity
+     * Function: driver
      *
-     * This function sets the target velocity for the flywheel.
-     * This implementation sets all the motors to the same velocity
+     * This function allows for starting and stopping of the flywheel in driver
+     * control
      */
-    void set_velocity(int16_t velocity);
+    void driver(pros::controller_id_e_t controller,
+                pros::controller_digital_e_t pwr_button);
 
     /**
      * Function: set_velocity
      *
-     * This function sets the target velocity for the flywheel.
-     * This implementation sets each motor's velocity individually
+     * This function sets the target velocity for the motors running the
+     * flywheel.
      */
-    void set_velocity(std::vector<int16_t> velocity);
+    void set_velocity(int16_t velocity);
 
     /**
      * Function: stop
