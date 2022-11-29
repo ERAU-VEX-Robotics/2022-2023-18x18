@@ -17,6 +17,8 @@ class Flywheel {
     // The motor group containing all of the motors on the flywheel
     Motor_Group motors;
 
+    const int flywheel_velo = 3600;
+
   public:
     /**
      * The Constructor for the Intake Class
