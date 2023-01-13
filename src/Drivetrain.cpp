@@ -19,6 +19,16 @@ void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
         controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 }
 
+void Drivetrain::arcade_driver(pros::controller_id_e_t controller) {
+    int power = pros::c::controller_get_analog(
+        controller, pros::E_CONTROLLER_ANALOG_LEFT_Y);
+    int turn = pros::c::controller_get_analog(controller,
+                                              pros::E_CONTROLLER_ANALOG_LEFT_X);
+
+    left_motors.move(power + turn);
+    right_motors.move(power - turn);
+}
+
 void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {
     if (left_vals) {
         printf("Left Motor Telemetry\n");
