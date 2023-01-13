@@ -1,10 +1,8 @@
 #ifndef EXTERNS_HPP
 #define EXTERNS_HPP
 
-#include "Drivetrain.hpp"
-#include "Intake.hpp"
+#include "Flywheel.hpp"
 
-extern Drivetrain drive;
-extern Intake intake;
+extern Flywheel flywheel;
 
 #endif /* externs.hpp */
