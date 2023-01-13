@@ -23,6 +23,11 @@ void opcontrol() {
         drive.print_telemetry(0, E_MOTOR_GROUP_TELEM_PRINT_CURRENT |
                                      E_MOTOR_GROUP_TELEM_PRINT_VELOCITY |
                                      E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE);
+
+        intake.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_L1,
+                      pros::E_CONTROLLER_DIGITAL_L2);
+        flywheel.driver(pros::E_CONTROLLER_MASTER,
+                        pros::E_CONTROLLER_DIGITAL_A);
         pros::delay(20);
     }
 }
