@@ -1,4 +1,5 @@
 #include "Flywheel.hpp"
+#include "pros/misc.h"
 #include "pros/rtos.h"
 #include "utils.h"
 #include <cmath>
@@ -68,11 +69,14 @@ void Flywheel::set_pid_consts(double Pconst, double Iconst, double Dconst) {
 
 void Flywheel::driver(pros::controller_id_e_t controller,
                       pros::controller_digital_e_t pwr_button) {
-    static bool enabled = true;
-    if (enabled)
-        set_velocity(flywheel_velo);
-    else
-        stop();
+    static bool running = true;
+    if (pros::c::controller_get_digital_new_press(controller, pwr_button)) {
+        running = !running; // Toggle flywheel status
+        if (running)
+            resume_pid_task();
+        else
+            pause_pid_task();
+    }
 }
 
 void Flywheel::set_velocity(int16_t velocity) {
