@@ -1,4 +1,5 @@
 #include "Motor_Group.hpp"
+#include "pros/motors.h"
 #include <vector>
 
 /* The Constructors for Motor_Group*/
@@ -111,6 +112,13 @@ double Motor_Group::get_avg_position(void) {
     double sum = 0;
     for (int p : motor_ports)
         sum += pros::c::motor_get_position(p);
+    return sum / motor_ports.size();
+}
+
+double Motor_Group::get_avg_velocity(void) {
+    double sum = 0;
+    for (int p : motor_ports)
+        sum += pros::c::motor_get_actual_velocity(p);
     return sum / motor_ports.size();
 }
 
