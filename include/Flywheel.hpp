@@ -35,9 +35,9 @@ class Flywheel {
      * that member functions that are passed as task functions must be static. I
      * can't make pid_task_fn static, because it includes references to the
      * Flywheel object. So, I created this function, based on information from:
-     * https://www.vexforum.com/t/pros-task-on-member-functions/105000/9 static
+     * https://www.vexforum.com/t/pros-task-on-member-functions/105000/9
      */
-    void trampoline(void *param);
+    static void trampoline(void *param);
 
   public:
     /**
@@ -55,12 +55,13 @@ class Flywheel {
 
     void set_pid_consts(double kP, double kI, double kD);
 
+    // Initializes pid_task, starting the Flywheel PID task
     void init_pid_task();
-
+    // Pauses the Flywheel PID task
     void pause_pid_task();
-
+    // Resumes the Flywheel PID task, assuming it was previously paused
     void resume_pid_task();
-
+    // Removes/deletes the Flywheel PID task
     void end_pid_task();
 
     /**

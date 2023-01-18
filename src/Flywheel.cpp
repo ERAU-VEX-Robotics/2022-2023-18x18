@@ -54,6 +54,10 @@ void Flywheel::init_pid_task() {
                              TASK_STACK_DEPTH_DEFAULT, "Flywheel PID Task");
 }
 
+void Flywheel::pause_pid_task() { pros::c::task_suspend(pid_task); }
+
+void Flywheel::resume_pid_task() { pros::c::task_resume(pid_task); }
+
 void Flywheel::end_pid_task() { pros::c::task_delete(pid_task); }
 
 void Flywheel::set_pid_consts(double Pconst, double Iconst, double Dconst) {
