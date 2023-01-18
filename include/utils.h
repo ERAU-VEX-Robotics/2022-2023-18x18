@@ -7,6 +7,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Function: pid
  *
@@ -26,12 +30,16 @@
  * \param integral A pointer to a double containing the integral value. This
  * must be a pointer so that the integral value can be maintained between
  * function calls.
- * \param prevError A pointer to the previous error. This must
+ * \param prev_error A pointer to the previous error. This must
  * be a pointer for the same reason as integral
  *
  * \returns The output power to set the motors to.
  */
 double pid(double kP, double kI, double kD, double error, double *integral,
-           double *prevError);
+           double *prev_error);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* utils.h */

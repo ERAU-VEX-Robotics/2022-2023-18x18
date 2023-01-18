@@ -218,6 +218,17 @@ class Motor_Group {
     double get_avg_position(void);
 
     /**
+     * Function: get_avg_velocity
+     * This function returns the average current velocity of every motor
+     * in the group, using the internal motor encoders. It uses the
+     * PROS motor_get_velocity function and calculates the average of
+     * those values
+     *
+     * @returns The current average motor velocity
+     */
+    double get_avg_velocity(void);
+
+    /**
      * Function: get_brake_modes
      * This function gets the current brake modes for each motor
      *

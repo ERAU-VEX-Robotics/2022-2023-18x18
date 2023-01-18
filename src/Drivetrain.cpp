@@ -1,6 +1,4 @@
 #include "Drivetrain.hpp"
-#include "pros/misc.h"
-#include <sys/types.h>
 
 Drivetrain::Drivetrain(std::initializer_list<int> left_ports,
                        std::initializer_list<int> right_ports,
