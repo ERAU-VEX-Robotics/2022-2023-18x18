@@ -3,7 +3,7 @@
 #include "pros/rtos.h"
 #include "utils.h"
 #include <cmath>
-#include <iostream>
+#include <cstdio>
 
 Flywheel::Flywheel(std::initializer_list<int> ports,
                    std::initializer_list<bool> reverses)
@@ -32,10 +32,6 @@ void Flywheel::pid_task_fn() {
 
         if (fabs(voltage) > 12000)
             voltage = copysign(12000, voltage);
-
-        std::cout << "Motor Voltage: " << voltage << std::endl;
-        std::cout << "Motor Velocity: " << motors.get_avg_velocity()
-                  << std::endl;
 
         motors.move_voltage(voltage);
         pros::delay(20);
@@ -85,3 +81,8 @@ void Flywheel::set_velocity(int16_t velocity) {
 }
 
 void Flywheel::stop() { motors.brake(); }
+
+void Flywheel::print_telemetry(uint8_t vals_to_print) {
+    printf("Flywheel Telemetry\n");
+    motors.print_telemetry(vals_to_print);
+}
