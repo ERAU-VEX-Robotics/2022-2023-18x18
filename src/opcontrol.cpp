@@ -1,6 +1,5 @@
-#include "Motor_Group.hpp"
+#include "externs.hpp"
 #include "main.h"
-#include "pros/misc.h"
 #include "pros/rtos.hpp"
 
 /**
@@ -17,12 +16,8 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
     while (true) {
-        drive.tank_driver(pros::E_CONTROLLER_MASTER);
-        drive.print_telemetry(0, E_MOTOR_GROUP_TELEM_PRINT_CURRENT |
-                                     E_MOTOR_GROUP_TELEM_PRINT_VELOCITY |
-                                     E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE);
-        pros::delay(20);
+        pros::delay(2);
     }
+    flywheel.end_pid_task();
 }
