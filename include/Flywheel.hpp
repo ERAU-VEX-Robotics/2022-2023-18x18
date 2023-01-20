@@ -10,6 +10,7 @@
  */
 #include "Motor_Group.hpp"
 #include "pros/rtos.h"
+#include <atomic>
 #include <initializer_list>
 
 class Flywheel {
@@ -17,7 +18,7 @@ class Flywheel {
     // The motor group containing all of the motors on the flywheel
     Motor_Group motors;
 
-    const int flywheel_velo = 600;
+    std::atomic<int> flywheel_velo = 600;
 
     double kP, kI, kD = 0;
 
@@ -64,14 +65,18 @@ class Flywheel {
     // Removes/deletes the Flywheel PID task
     void end_pid_task();
 
+    // Sets the flywheel's target velocity
+    void set_target_velo(int velo);
+
     /**
      * Function: driver
      *
      * This function allows for starting and stopping of the flywheel in driver
-     * control
+     * control, as well as changing the direction
      */
     void driver(pros::controller_id_e_t controller,
-                pros::controller_digital_e_t pwr_button);
+                pros::controller_digital_e_t pwr_button,
+                pros::controller_digital_e_t rev_button);
 
     /**
      * Function: set_velocity

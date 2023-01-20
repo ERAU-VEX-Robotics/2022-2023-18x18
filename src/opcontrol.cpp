@@ -15,6 +15,8 @@
  */
 void opcontrol() {
     while (true) {
+        flywheel.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_A,
+                        pros::E_CONTROLLER_DIGITAL_B);
         drive.tank_driver(pros::E_CONTROLLER_MASTER);
         drive.print_telemetry(0, E_MOTOR_GROUP_TELEM_PRINT_CURRENT |
                                      E_MOTOR_GROUP_TELEM_PRINT_VELOCITY |
@@ -22,9 +24,8 @@ void opcontrol() {
 
         intake.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_L1,
                       pros::E_CONTROLLER_DIGITAL_L2);
-        flywheel.driver(pros::E_CONTROLLER_MASTER,
-                        pros::E_CONTROLLER_DIGITAL_A);
-        pros::delay(20);
+
+        pros::delay(2);
     }
     flywheel.end_pid_task();
 }
