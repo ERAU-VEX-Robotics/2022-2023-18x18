@@ -26,15 +26,18 @@ void Flywheel::pid_task_fn() {
     double prev_error = 0;
     double error = 0;
 
-    while (1) {
+    while (true) {
         error = flywheel_velo - motors.get_avg_velocity();
+        printf("Flywheel error: %.2lf\n", error);
         double voltage = pid(kP, kI, kD, error, &integral, &prev_error);
 
         if (fabs(voltage) > 12000)
             voltage = copysign(12000, voltage);
+        printf("Flywheel voltage: %.2lf\n", voltage);
 
         motors.move_voltage(voltage);
-        pros::delay(20);
+
+        pros::delay(2);
     }
 }
 
@@ -51,11 +54,19 @@ void Flywheel::init_pid_task() {
                              TASK_STACK_DEPTH_DEFAULT, "Flywheel PID Task");
 }
 
-void Flywheel::pause_pid_task() { pros::c::task_suspend(pid_task); }
+void Flywheel::pause_pid_task() {
+    pros::c::task_suspend(pid_task);
+    stop();
+}
 
 void Flywheel::resume_pid_task() { pros::c::task_resume(pid_task); }
 
-void Flywheel::end_pid_task() { pros::c::task_delete(pid_task); }
+void Flywheel::end_pid_task() {
+    pause_pid_task();
+    pros::c::task_delete(pid_task);
+}
+
+void Flywheel::set_target_velo(int velo) { flywheel_velo = velo; }
 
 void Flywheel::set_pid_consts(double Pconst, double Iconst, double Dconst) {
     kP = Pconst;
@@ -64,14 +75,24 @@ void Flywheel::set_pid_consts(double Pconst, double Iconst, double Dconst) {
 }
 
 void Flywheel::driver(pros::controller_id_e_t controller,
-                      pros::controller_digital_e_t pwr_button) {
+                      pros::controller_digital_e_t pwr_button,
+                      pros::controller_digital_e_t rev_button) {
     static bool running = true;
+    static bool reversed = false;
     if (pros::c::controller_get_digital_new_press(controller, pwr_button)) {
         running = !running; // Toggle flywheel status
         if (running)
             resume_pid_task();
         else
             pause_pid_task();
+    }
+
+    if (pros::c::controller_get_digital_new_press(controller, rev_button)) {
+        reversed = !reversed; // Toggle flywheel status
+        if (reversed)
+            set_target_velo(-300);
+        else
+            set_target_velo(600);
     }
 }
 
