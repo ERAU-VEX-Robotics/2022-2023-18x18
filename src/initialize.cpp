@@ -3,8 +3,8 @@
 Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
                  {true, false, true, false, true},
                  {false, true, false, true, false});
-Intake intake({3, 4}, {false, false});
-Flywheel flywheel({4}, {false});
+Intake intake({15, 14}, {true, false});
+Flywheel flywheel({5}, {false});
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -12,7 +12,7 @@ Flywheel flywheel({4}, {false});
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    flywheel.set_pid_consts(0.5, 1, 0.5);
+    flywheel.set_pid_consts(50, 0.1, 1);
     flywheel.init_pid_task();
 }
 
