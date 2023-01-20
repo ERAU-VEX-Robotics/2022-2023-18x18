@@ -1,5 +1,6 @@
 #include "externs.hpp"
 #include "main.h"
+#include "pros/misc.h"
 #include "pros/rtos.hpp"
 
 /**
@@ -17,6 +18,8 @@
  */
 void opcontrol() {
     while (true) {
+        flywheel.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_A,
+                        pros::E_CONTROLLER_DIGITAL_B);
         pros::delay(2);
     }
     flywheel.end_pid_task();

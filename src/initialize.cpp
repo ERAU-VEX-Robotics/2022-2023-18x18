@@ -1,7 +1,7 @@
 #include "Flywheel.hpp"
 #include "main.h"
 
-Flywheel flywheel({4}, {false});
+Flywheel flywheel({5}, {false});
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -9,7 +9,7 @@ Flywheel flywheel({4}, {false});
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    flywheel.set_pid_consts(0.5, 1, 0.5);
+    flywheel.set_pid_consts(50, 0.1, 1);
     flywheel.init_pid_task();
 }
 
