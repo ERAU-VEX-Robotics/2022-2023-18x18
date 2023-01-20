@@ -77,7 +77,7 @@ void Flywheel::set_pid_consts(double Pconst, double Iconst, double Dconst) {
 void Flywheel::driver(pros::controller_id_e_t controller,
                       pros::controller_digital_e_t pwr_button,
                       pros::controller_digital_e_t rev_button) {
-    static bool running = true;
+    static bool running = false;
     static bool reversed = false;
     if (pros::c::controller_get_digital_new_press(controller, pwr_button)) {
         running = !running; // Toggle flywheel status
