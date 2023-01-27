@@ -22,17 +22,35 @@ class Drivetrain {
     // the base
     Motor_Group left_motors, right_motors;
 
+    // The Drivetrain's PID constants, both for moving straight and for turning
+    double kP_straight, kP_turn, kI_straight, kI_turn, kD_straight, kD_turn = 0;
+
+    // The threshold for when to set is_settled to true.
+    double settled_threshold = 0.1;
+
+    // Variables tracking important information about the drivetrain
+    double track_width, tracking_wheel_radius;
+
+    // Atomic variables storing the PID controllers targets
+    std::atomic<double> left_targ, right_targ = 0;
+
+    // The PROS task type that contains the PID task for the drivetrain
+    pros::task_t pid_task;
+
     // The ADI shaft encoders on each side of the drive train. These are used to
     // accurately track the rotation of the robot's wheels, allowing us to move
     // the robot with high precision.
     pros::c::adi_encoder_t left_encdr, right_encdr;
 
-    // The Drivetrain's PID constants, both for moving straight and for turning
-    double kP_straight, kP_turn, kI_straight, kI_turn, kD_straight, kD_turn = 0;
-
     // Boolean tracking which PID constants to use
     std::atomic<bool> use_turn_consts = false;
 
+    // Boolean tracking whether the drivetrain PID has stopped. Used to
+    // determine if the drivetrain has completed it's action during the
+    // autonomous period.
+    std::atomic<bool> is_settled = false;
+
+    // Boolean tracking whether the drivetrain includes encoders
     bool using_encdrs = false;
 
     /**
@@ -40,12 +58,6 @@ class Drivetrain {
      * code for PID controllers for each motor group of the drivetrain
      */
     void pid_task_fn();
-
-    // The PROS task type that contains the PID task for the drivetrain
-    pros::task_t pid_task;
-
-    // Atomic variables storing the PID controllers targets
-    std::atomic<double> left_targ, right_targ = 0;
 
     /**
      * A static function used to call pid_task_fn. The PROS task system requires
@@ -55,9 +67,6 @@ class Drivetrain {
      * https://www.vexforum.com/t/pros-task-on-member-functions/105000/9
      */
     static void trampoline(void *param);
-
-    // Variables tracking important information about the drivetrain
-    double track_width, tracking_wheel_radius;
 
   public:
     /**
@@ -156,6 +165,10 @@ class Drivetrain {
     // Removes/deletes the Drivetrain PID task. Should always be called at the
     // end of autonomous().
     void end_pid_task();
+
+    // Sets the threshold for declaring whether the drivetrain has settled, i.e.
+    // has reached its target position.
+    void set_settled_threshold(double threshold);
 
     /**
      * Function: print_telemetry
