@@ -42,7 +42,13 @@ void Drivetrain::pid_task_fn() {
             right_error = right_targ - right_motors.get_avg_position();
         }
 
-        double left_voltage, right_voltage;
+        if (fabs(left_error) < settled_threshold &&
+            fabs(right_error) < settled_threshold)
+            is_settled = true;
+        else
+            is_settled = false;
+
+        int left_voltage, right_voltage;
 
         if (use_turn_consts) {
             left_voltage = pid(kP_turn, kI_turn, kD_turn, left_error,
@@ -56,9 +62,9 @@ void Drivetrain::pid_task_fn() {
                                 &right_integral, &right_prev_error);
         }
 
-        if (fabs(left_voltage) > 12000)
+        if (abs(left_voltage) > 12000)
             left_voltage = copysign(12000, left_voltage);
-        if (fabs(right_voltage) > 12000)
+        if (abs(right_voltage) > 12000)
             right_voltage = copysign(12000, right_voltage);
 
         left_motors.move_voltage(left_voltage);
@@ -85,6 +91,8 @@ void Drivetrain::set_pid_turn_consts(double Pconst, double Iconst,
 void Drivetrain::move_straight(double inches) {
     // Convert inches to degrees for the wheels to rotate
     double temp = inches / tracking_wheel_radius * 180 / M_PI;
+    is_settled = false;
+
     left_targ = temp;
     right_targ = temp;
 }
@@ -94,6 +102,8 @@ void Drivetrain::turn_angle(double angle) {
     // inches each side needs to move. Then, we turn that into degrees
     double temp = (angle * track_width * (M_PI / 180)) /
                   (tracking_wheel_radius * 180 / M_PI);
+    is_settled = false;
+
     left_targ = temp;
     right_targ = -temp;
 }
@@ -108,6 +118,10 @@ void Drivetrain::end_pid_task() {
     pros::c::task_delete(pid_task);
     left_motors.move(0);
     right_motors.move(0);
+}
+
+void Drivetrain::set_settled_threshold(double threshold) {
+    settled_threshold = threshold;
 }
 
 void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
