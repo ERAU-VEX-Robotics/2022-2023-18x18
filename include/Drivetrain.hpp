@@ -26,11 +26,11 @@ class Drivetrain {
     // The Drivetrain's PID constants, both for moving straight and for turning
     double kP_straight, kP_turn, kI_straight, kI_turn, kD_straight, kD_turn = 0;
 
-    // The threshold for when to set is_settled to true.
-    double settled_threshold = 0.1;
+    // The threshold for when to set is_settled to true, in degrees.
+    double settled_threshold = 10;
 
     // Variables tracking important information about the drivetrain
-    double track_width, tracking_wheel_radius, tracking_wheel_gear_ratio;
+    double track_radius, tracking_wheel_radius, tracking_wheel_gear_ratio;
 
     // Atomic variables storing the PID controllers targets
     std::atomic<double> left_targ, right_targ = 0;
@@ -166,6 +166,10 @@ class Drivetrain {
     // Removes/deletes the Drivetrain PID task. Should always be called at the
     // end of autonomous().
     void end_pid_task();
+
+    // Runs in a while loop until the PID task indicates it has reached its
+    // target.
+    void wait_until_settled();
 
     // Sets the threshold for declaring whether the drivetrain has settled, i.e.
     // has reached its target position.
