@@ -11,6 +11,13 @@ Drivetrain::Drivetrain(std::initializer_list<int> left_ports,
     right_motors.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
 }
 
+void Drivetrain::trampoline(void *param) {
+    if (param) {
+        Drivetrain *that = static_cast<Drivetrain *>(param);
+        that->pid_task_fn();
+    }
+}
+
 void Drivetrain::add_adi_encoders(char left_encdr_top_port,
                                   char left_encdr_bot_port, bool left_encdr_rev,
                                   char right_encdr_top_port,
@@ -90,7 +97,8 @@ void Drivetrain::set_pid_turn_consts(double Pconst, double Iconst,
 
 void Drivetrain::move_straight(double inches) {
     // Convert inches to degrees for the wheels to rotate
-    double temp = inches / tracking_wheel_radius * 180 / M_PI;
+    double temp =
+        inches / tracking_wheel_radius * 180 / M_PI * tracking_wheel_gear_ratio;
     is_settled = false;
 
     left_targ = temp;
@@ -101,7 +109,8 @@ void Drivetrain::turn_angle(double angle) {
     // This consists of 2 parts. First, we turn the angle into the number of
     // inches each side needs to move. Then, we turn that into degrees
     double temp = (angle * track_width * (M_PI / 180)) /
-                  (tracking_wheel_radius * 180 / M_PI);
+                  (tracking_wheel_radius * 180 / M_PI) *
+                  tracking_wheel_gear_ratio;
     is_settled = false;
 
     left_targ = temp;
@@ -122,6 +131,13 @@ void Drivetrain::end_pid_task() {
 
 void Drivetrain::set_settled_threshold(double threshold) {
     settled_threshold = threshold;
+}
+
+void Drivetrain::set_drivetrain_dimensions(double tw, double twr,
+                                           double gear_ratio) {
+    track_width = tw;
+    tracking_wheel_radius = twr;
+    tracking_wheel_gear_ratio = gear_ratio;
 }
 
 void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
