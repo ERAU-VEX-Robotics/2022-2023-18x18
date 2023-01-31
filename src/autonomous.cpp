@@ -14,5 +14,7 @@
  */
 void autonomous() {
     flywheel.resume_pid_task();
+    drive.init_pid_task();
     flywheel.pause_pid_task();
+    drive.end_pid_task();
 }
