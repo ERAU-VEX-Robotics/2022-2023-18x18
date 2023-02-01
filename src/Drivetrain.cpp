@@ -161,7 +161,7 @@ void Drivetrain::set_settled_threshold(double threshold) {
 
 void Drivetrain::set_drivetrain_dimensions(double tw, double twr,
                                            double gear_ratio) {
-    track_distance = tw;
+    track_distance = tw / 2;
     tracking_wheel_radius = twr;
     tracking_wheel_gear_ratio = gear_ratio;
 }
