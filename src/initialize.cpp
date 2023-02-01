@@ -6,8 +6,7 @@ Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
 Intake intake({15, 14}, {true, false});
 Flywheel flywheel({5}, {false});
 /**
- * Runs initialization code. This occurs as soon as the program is started.
- *
+ * Runs initialization code.This occurs as soon as the program is started.
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */

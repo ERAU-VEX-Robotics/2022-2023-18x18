@@ -26,6 +26,8 @@ void Intake::in() { motors.move(127); }
 
 void Intake::out() { motors.move(-127); }
 
+void Intake::stop() { motors.move(-127); }
+
 void Intake::print_telemetry(uint8_t vals_to_print) {
     printf("Intake Telemetry");
     motors.print_telemetry(vals_to_print);
