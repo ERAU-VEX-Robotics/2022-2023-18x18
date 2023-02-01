@@ -42,7 +42,7 @@ double Drivetrain::convert_inches_to_degrees(double inches) {
            tracking_wheel_gear_ratio;
 }
 
-double Drivetrain::(double angle, double radius) {
+double Drivetrain::arc_len(double angle, double radius) {
     // The arc length formula, including converting the angle from degrees
     return radius * angle * M_PI / 180;
 }
