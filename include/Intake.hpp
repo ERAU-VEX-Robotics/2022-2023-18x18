@@ -45,9 +45,11 @@ class Intake {
                 pros::controller_digital_e_t out_button);
 
     // Wraps the necessary code to run the motors to collect disks
-    void in();
+    inline void in();
     // Wraps the necessary code to run the motors to expel disks from the intake
-    void out();
+    inline void out();
+    // Stops the intake
+    inline void stop();
 
     /**
      * Function: print_telemetry
