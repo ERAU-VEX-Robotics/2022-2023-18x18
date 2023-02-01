@@ -14,6 +14,7 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+    flywheel.resume_pid_task();
     while (true) {
         flywheel.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_A,
                         pros::E_CONTROLLER_DIGITAL_B);
