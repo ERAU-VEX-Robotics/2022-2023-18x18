@@ -18,6 +18,35 @@ void Drivetrain::trampoline(void *param) {
     }
 }
 
+double Drivetrain::convert_inches_to_degrees(double inches) {
+    /**
+     * Formula Explanation:
+     * We treat inches as an arc length, so we divide it by the tracking wheel
+     * radius (since the tracking wheels are the ones from which all
+     * measurements are gathered). This is based off of the arc length equation,
+     * s = r * theta. In this case, we want theta, the central angle, or the
+     * angle that the tracking wheel needs to rotate.
+     *
+     * Next, we use 180 / pi to convert from radians to degrees, since both the
+     * internal motor encoders and ADI encoders return values in degrees.
+     *
+     * Finally, to account for any gear ratio between the encoder and the
+     * tracking wheel (this typically only arises when using the internal motor
+     * encoders), we multiply by the gear ratio, defined as (wheel connected to
+     * encoder / wheel connected to the wheel). If the ratio is greater than 1,
+     * then the gear on the encoder has more teeth than that of the wheel. So,
+     * the rotation of the wheel is undercounted. Thus, multiplying by the gear
+     * ratio accounts for this undermeasuring.
+     */
+    return inches / tracking_wheel_radius * 180 / M_PI *
+           tracking_wheel_gear_ratio;
+}
+
+double Drivetrain::(double angle, double radius) {
+    // The arc length formula, including converting the angle from degrees
+    return radius * angle * M_PI / 180;
+}
+
 void Drivetrain::add_adi_encoders(char left_encdr_top_port,
                                   char left_encdr_bot_port, bool left_encdr_rev,
                                   char right_encdr_top_port,
@@ -97,8 +126,7 @@ void Drivetrain::set_pid_turn_consts(double Pconst, double Iconst,
 
 void Drivetrain::move_straight(double inches) {
     // Convert inches to degrees for the wheels to rotate
-    double temp =
-        inches / tracking_wheel_radius * 180 / M_PI * tracking_wheel_gear_ratio;
+    double temp = convert_inches_to_degrees(inches);
     is_settled = false;
 
     left_targ = temp;
@@ -108,9 +136,7 @@ void Drivetrain::turn_angle(double angle) {
     // Convert the angle to turn into degrees for the wheels to rotate
     // This consists of 2 parts. First, we turn the angle into the number of
     // inches each side needs to move. Then, we turn that into degrees
-    double temp = (angle * track_width * (M_PI / 180)) /
-                  (tracking_wheel_radius * 180 / M_PI) *
-                  tracking_wheel_gear_ratio;
+    double temp = convert_inches_to_degrees(arc_len(angle, track_distance));
     is_settled = false;
 
     left_targ = temp;
@@ -135,7 +161,7 @@ void Drivetrain::set_settled_threshold(double threshold) {
 
 void Drivetrain::set_drivetrain_dimensions(double tw, double twr,
                                            double gear_ratio) {
-    track_width = tw;
+    track_distance = tw;
     tracking_wheel_radius = twr;
     tracking_wheel_gear_ratio = gear_ratio;
 }

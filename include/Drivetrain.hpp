@@ -30,7 +30,12 @@ class Drivetrain {
     double settled_threshold = 0.1;
 
     // Variables tracking important information about the drivetrain
-    double track_width, tracking_wheel_radius, tracking_wheel_gear_ratio;
+    // track_distance: The distance from the center of the robot to the tracking
+    // wheels
+    // tracking_wheel_radius: The radius of the tracking wheels
+    // tracking_wheel_gear_ratio: The gear ratio from the tracking wheels to
+    // their encoders, defined as (gear on encoder) / (gear on wheel)
+    double track_distance, tracking_wheel_radius, tracking_wheel_gear_ratio;
 
     // Atomic variables storing the PID controllers targets
     std::atomic<double> left_targ, right_targ = 0;
@@ -68,6 +73,23 @@ class Drivetrain {
      * https://www.vexforum.com/t/pros-task-on-member-functions/105000/9
      */
     static void trampoline(void *param);
+
+    /**
+     * A function used to handle the conversion from inches for the drivetrain
+     * to travel to degrees for the wheels to rotate.
+     * \param inches The inches to travel
+     * \return The degrees to rotate
+     */
+    inline double convert_inches_to_degrees(double inches);
+
+    /**
+     * A function used to calculate arc length, used for turning functions
+     * \param radius The radius from the center of rotation to the tracking
+     * wheel used - typically just the tracking wheel radius
+     * \param angle The angle for the arc, in degrees
+     * \returns the arc length
+     */
+    inline double arc_len(double angle, double radius);
 
   public:
     /**
@@ -182,8 +204,8 @@ class Drivetrain {
      * \param tracking_wheel_rad The radii of the tracking wheels, assumed to be
                                  the same for both wheels
      * \param gear_ratio The gear ratio from the wheel to the device measuring
-                         the rotation - should be calculated as (wheel connected
-                         to encoder / wheel connected to the wheel)
+                         the rotation - should be calculated as (gear connected
+                         to encoder / gear connected to the wheel)
      */
     void set_drivetrain_dimensions(double tracking_wheel_width,
                                    double tracking_wheel_rad,
