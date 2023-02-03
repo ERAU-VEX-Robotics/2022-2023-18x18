@@ -1,8 +1,5 @@
-#include "Drivetrain.hpp"
 #include "main.h"
-Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
-                 {true, false, true, false, true},
-                 {false, true, false, true, false});
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
