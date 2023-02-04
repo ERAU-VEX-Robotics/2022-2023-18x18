@@ -1,4 +1,5 @@
 #include "Motor_Group.hpp"
+#include <cmath>
 #include <vector>
 
 /* The Constructors for Motor_Group*/
@@ -109,9 +110,13 @@ std::vector<bool> Motor_Group::are_reversed(void) {
 
 double Motor_Group::get_avg_position(void) {
     double sum = 0;
+    int cnt = 0;
     for (int p : motor_ports)
-        sum += pros::c::motor_get_position(p);
-    return sum / motor_ports.size();
+        if (std::isfinite(pros::c::motor_get_position(p))) {
+            sum += pros::c::motor_get_position(p);
+            ++cnt;
+        }
+    return sum / cnt;
 }
 
 std::vector<pros::motor_brake_mode_e_t> Motor_Group::get_brake_modes(void) {
