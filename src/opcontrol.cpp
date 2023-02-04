@@ -19,7 +19,7 @@ void opcontrol() {
     while (true) {
         flywheel.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_A,
                         pros::E_CONTROLLER_DIGITAL_B);
-        drive.arcade_driver(pros::E_CONTROLLER_MASTER);
+        drive.arcade_driver(pros::E_CONTROLLER_MASTER, true);
         intake.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_R1,
                       pros::E_CONTROLLER_DIGITAL_L1,
                       pros::E_CONTROLLER_DIGITAL_R2);
