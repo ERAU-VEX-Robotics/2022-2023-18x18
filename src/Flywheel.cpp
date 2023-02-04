@@ -91,7 +91,7 @@ void Flywheel::driver(pros::controller_id_e_t controller,
     if (pros::c::controller_get_digital_new_press(controller, rev_button)) {
         reversed = !reversed; // Toggle flywheel status
         if (reversed)
-            set_target_velo(-FLYWHEEL_REV_TARG);
+            set_target_velo(FLYWHEEL_REV_TARG);
         else
             set_target_velo(FLYWHEEL_FWD_TARG);
     }
