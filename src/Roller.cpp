@@ -4,7 +4,7 @@
 Roller::Roller(std::initializer_list<int> ports,
                std::initializer_list<bool> revs, double gear_ratio)
     : motors(ports, revs), gear_ratio(gear_ratio) {
-    motors.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE)
+    motors.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
 void Roller::clockwise() { motors.move(127); }
