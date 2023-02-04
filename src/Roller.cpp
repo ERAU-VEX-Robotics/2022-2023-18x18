@@ -8,6 +8,7 @@ Roller::Roller(std::initializer_list<int> ports,
 
 void Roller::clockwise() { motors.move(127); }
 void Roller::counterclockwise() { motors.move(-127); }
+void Roller::stop() { motors.move(0); }
 
 void Roller::clockwise(double degrees) {
     motors.move_relative(degrees / gear_ratio, 200);
