@@ -8,6 +8,7 @@
 #define ROLLER_HPP
 
 #include "Motor_Group.hpp"
+#include "pros/misc.h"
 #include <initializer_list>
 
 class Roller {
@@ -52,6 +53,11 @@ class Roller {
 
     // Sets the mechanism's motors to stop running
     void stop();
+
+    // Allows for roller control in driver
+    void driver(pros::controller_id_e_t controller,
+                pros::controller_digital_e_t cw_btn,
+                pros::controller_digital_e_t ccw_btn);
 };
 
 #endif /* Roller.hpp*/
