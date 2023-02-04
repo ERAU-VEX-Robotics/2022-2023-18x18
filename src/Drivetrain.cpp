@@ -111,7 +111,8 @@ void Drivetrain::pid_task_fn() {
 #ifdef D_DEBUG
         printf("Left Error: %.2lf\nRight Error: %.2lf\n", left_error,
                right_error);
-        print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE,
+        print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
+                            E_MOTOR_GROUP_TELEM_PRINT_POSITION,
                         E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
                             E_MOTOR_GROUP_TELEM_PRINT_POSITION);
 
