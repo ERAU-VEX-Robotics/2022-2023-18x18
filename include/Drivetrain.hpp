@@ -142,14 +142,17 @@ class Drivetrain {
      * A driver control function in one joystick controls
      * both forward/backward movement and turning.
      *
-     * This implementation uses the left joystick
+     * This implementation uses the left joystick by default
      *
      * The Y axis controls forward/backward
      * The X axis controls turning
      *
      * @param controller The Controller ID whose joystick to read the value of
+     * @param use_right indicates whether or not to use the right joystick.
+     * Defaults to false
      */
-    void arcade_driver(pros::controller_id_e_t controller);
+    void arcade_driver(pros::controller_id_e_t controller,
+                       bool use_right = false);
 
     /**
      * Functions to set the PID controller constants. Each controller uses the

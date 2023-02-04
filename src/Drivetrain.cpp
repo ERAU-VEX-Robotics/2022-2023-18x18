@@ -207,12 +207,21 @@ void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
         controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 }
 
-void Drivetrain::arcade_driver(pros::controller_id_e_t controller) {
-    int power = pros::c::controller_get_analog(
-        controller, pros::E_CONTROLLER_ANALOG_LEFT_Y);
-    int turn = pros::c::controller_get_analog(controller,
+void Drivetrain::arcade_driver(pros::controller_id_e_t controller,
+                               bool use_right) {
+    int power;
+    int turn;
+    if (use_right) {
+        power = pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+        turn = pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_RIGHT_X);
+    } else {
+        power = pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        turn = pros::c::controller_get_analog(controller,
                                               pros::E_CONTROLLER_ANALOG_LEFT_X);
-
+    }
     left_motors.move(power + turn);
     right_motors.move(power - turn);
 }
