@@ -119,8 +119,11 @@ void Drivetrain::pid_task_fn() {
 
         left_motors.move_voltage(left_voltage);
         right_motors.move_voltage(right_voltage);
-
+#ifdef D_DEBUG
         pros::delay(200);
+#else
+        pros::delay(2);
+#endif
     }
 }
 
