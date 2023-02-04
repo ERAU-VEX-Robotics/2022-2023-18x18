@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/misc.h"
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -22,7 +23,8 @@ void opcontrol() {
         intake.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_R1,
                       pros::E_CONTROLLER_DIGITAL_L1,
                       pros::E_CONTROLLER_DIGITAL_R2);
-
+        roller.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_UP,
+                      pros::E_CONTROLLER_DIGITAL_DOWN);
         pros::delay(2);
     }
     flywheel.end_pid_task();
