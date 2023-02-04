@@ -14,7 +14,7 @@ Roller roller({1}, {true}, 2.0 / 5.0);
 void initialize() {
     flywheel.set_pid_consts(50, 0.1, 1);
     flywheel.init_pid_task();
-    drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
+    // drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
     drive.set_pid_straight_consts(100, 0, 0);
     drive.set_pid_turn_consts(50, 0, 0);
     drive.set_drivetrain_dimensions(15.75, 2.5, 1);
