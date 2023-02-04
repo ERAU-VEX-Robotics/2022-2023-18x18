@@ -63,6 +63,9 @@ void Drivetrain::add_adi_encoders(char left_encdr_top_port,
 }
 
 void Drivetrain::pid_task_fn() {
+#ifdef D_DEBUG
+    printf("drive pid started\n");
+#endif
     double left_integral = 0;
     double left_prev_error = 0;
     double left_error = 0;
@@ -105,7 +108,7 @@ void Drivetrain::pid_task_fn() {
             left_voltage = copysign(12000, left_voltage);
         if (abs(right_voltage) > 12000)
             right_voltage = copysign(12000, right_voltage);
-#ifdef DEBUG
+#ifdef D_DEBUG
         printf("Left Error: %.2lf\nRight Error: %.2lf\n", left_error,
                right_error);
         print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE,
@@ -117,7 +120,7 @@ void Drivetrain::pid_task_fn() {
         left_motors.move_voltage(left_voltage);
         right_motors.move_voltage(right_voltage);
 
-        pros::delay(2);
+        pros::delay(200);
     }
 }
 
