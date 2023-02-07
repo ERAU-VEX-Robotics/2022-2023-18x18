@@ -12,8 +12,8 @@
  * from where it left off.
  */
 void autonomous() {
+    /*
     // flywheel.resume_pid_task();
-    drive.init_pid_task();
     // flywheel.pause_pid_task();
 
     // Move to grab disk in front of bot
@@ -47,5 +47,28 @@ void autonomous() {
     drive.move_straight(10);
     drive.wait_until_settled();
 
+    */
+    drive.init_pid_task();
+    // skills
+    ///*
+    drive.move_straight(2);
+    drive.wait_until_settled();
+    roller.clockwise(180);
+    drive.move_straight(-12);
+    drive.wait_until_settled();
+
+    drive.turn_angle(-45);
+    drive.wait_until_settled();
+
+    //*/
+
+    // match
+    /*
+        drive.move_straight(2);
+        drive.wait_until_settled();
+        roller.clockwise(180);
+        drive.move_straight(-0.5);
+        drive.wait_until_settled();
+        */
     drive.end_pid_task();
 }
