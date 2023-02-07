@@ -32,7 +32,7 @@ void Flywheel::pid_task_fn() {
 
         if (fabs(voltage) > 12000)
             voltage = copysign(12000, voltage);
-#ifdef DEBUG
+#ifdef F_DEBUG
         printf("Flywheel error: %.2lf\n", error);
         printf("Flywheel voltage: %.2lf\n", voltage);
 #endif
