@@ -66,6 +66,9 @@ void Drivetrain::pid_task_fn() {
 #ifdef D_DEBUG
     printf("drive pid started\n");
 #endif
+#ifdef D_DEBUG
+    printf("drive pid started\n");
+#endif
     double left_integral = 0;
     double left_prev_error = 0;
     double left_error = 0;
@@ -102,6 +105,9 @@ void Drivetrain::pid_task_fn() {
             right_voltage =
                 pid(kP_straight, kI_straight, kD_straight, right_error,
                     &right_integral, &right_prev_error);
+            right_voltage =
+                pid(kP_straight, kI_straight, kD_straight, right_error,
+                    &right_integral, &right_prev_error);
         }
 
         if (abs(left_voltage) > 12000)
@@ -117,13 +123,26 @@ void Drivetrain::pid_task_fn() {
                             E_MOTOR_GROUP_TELEM_PRINT_POSITION);
 
 #endif
+#ifdef D_DEBUG
+        printf("Left Error: %.2lf\nRight Error: %.2lf\n", left_error,
+               right_error);
+        print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
+                            E_MOTOR_GROUP_TELEM_PRINT_POSITION,
+                        E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
+                            E_MOTOR_GROUP_TELEM_PRINT_POSITION);
+
+#endif
 
         left_motors.move_voltage(left_voltage);
         right_motors.move_voltage(right_voltage);
 #ifdef D_DEBUG
         pros::delay(200);
 #else
+#ifdef D_DEBUG
+        pros::delay(200);
+#else
         pros::delay(2);
+#endif
 #endif
     }
 }
@@ -143,13 +162,7 @@ void Drivetrain::set_pid_turn_consts(double Pconst, double Iconst,
 }
 
 void Drivetrain::move_straight(double inches) {
-    // Convert inches to degrees for the wheels to rotate
-    double temp = convert_inches_to_degrees(inches);
-    is_settled = false;
-
-    left_targ = temp;
-    right_targ = temp;
-    // Set the encoder positions to 0
+    // Reset the encoder positions
     if (using_encdrs) {
         pros::c::adi_encoder_reset(left_encdr);
         pros::c::adi_encoder_reset(right_encdr);
@@ -157,9 +170,17 @@ void Drivetrain::move_straight(double inches) {
         left_motors.reset_positions();
         right_motors.reset_positions();
     }
-    is_settled = false;
+
+    // Convert inches to degrees for the wheels to rotate
+    double temp = convert_inches_to_degrees(inches);
+
+    // Update targets
+    left_targ = temp;
+    right_targ = temp;
 }
+
 void Drivetrain::turn_angle(double angle) {
+    // Reset the encoder positions
     if (using_encdrs) {
         pros::c::adi_encoder_reset(left_encdr);
         pros::c::adi_encoder_reset(right_encdr);
@@ -171,13 +192,10 @@ void Drivetrain::turn_angle(double angle) {
     // This consists of 2 parts. First, we turn the angle into the number of
     // inches each side needs to move. Then, we turn that into degrees
     double temp = convert_inches_to_degrees(arc_len(angle, track_distance));
-    is_settled = false;
 
+    // Update targets
     left_targ = temp;
     right_targ = -temp;
-    // Set the encoder positions to 0
-
-    is_settled = false;
 }
 
 void Drivetrain::init_pid_task() {
