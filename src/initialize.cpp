@@ -1,24 +1,42 @@
 #include "main.h"
+#include "pros/apix.h"
 
-Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
-                 {true, false, true, false, true},
-                 {false, true, false, true, false});
-Intake intake({3}, {false}, {4}, {true});
-Flywheel flywheel({14}, {true});
-Roller roller({1}, {true}, 2.0 / 5.0);
+// LVGL objects
+lv_obj_t *pg_main;
+lv_obj_t *pg_auton;
+lv_obj_t *btn_main_to_auton;
+lv_obj_t *btn_auton_to_main;
+lv_obj_t *btnm_auton_select;
+lv_obj_t *lbl;
+
+static lv_res_t show_auton_pg(lv_obj_t *btn) {
+    lv_obj_set_hidden(pg_main, false);
+    lv_obj_set_hidden(pg_auton, true);
+    return LV_RES_OK;
+}
+static lv_res_t show_main_pg(lv_obj_t *btn) {
+    lv_obj_set_hidden(pg_main, true);
+    lv_obj_set_hidden(pg_auton, false);
+    return LV_RES_OK;
+}
+
 /**
  * Runs initialization code.This occurs as soon as the program is started.
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    flywheel.set_pid_consts(50, 0.1, 1);
-    flywheel.init_pid_task();
-    flywheel.pause_pid_task();
-    // drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
-    drive.set_pid_straight_consts(100, 0, 0);
-    drive.set_pid_turn_consts(50, 0, 0);
-    drive.set_drivetrain_dimensions(15.75, 2, 1);
+    // GUI init
+    pg_main = lv_page_create(lv_scr_act(), NULL);
+    pg_auton = lv_page_create(lv_scr_act(), NULL);
+
+    lv_obj_set_hidden(pg_auton, true);
+
+    btn_main_to_auton = lv_btn_create(pg_main, NULL);
+    lv_btn_set_action(btn_main_to_auton, LV_BTN_ACTION_CLICK, show_auton_pg);
+
+    btn_auton_to_main = lv_btn_create(pg_auton, NULL);
+    lv_btn_set_action(btn_auton_to_main, LV_BTN_ACTION_CLICK, show_main_pg);
 }
 
 /**
