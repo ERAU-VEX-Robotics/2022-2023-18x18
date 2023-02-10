@@ -1,5 +1,12 @@
 #include "main.h"
 
+Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
+                 {true, false, true, false, true},
+                 {false, true, false, true, false});
+Intake intake({3}, {false}, {4}, {true});
+Flywheel flywheel({14}, {true});
+Roller roller({1}, {true}, 2.0 / 5.0);
+
 /**
  * Runs initialization code.This occurs as soon as the program is started.
  * All other competition modes are blocked by initialize; it is recommended
@@ -8,6 +15,14 @@
 void initialize() {
     // GUI init
     gui_init();
+
+    flywheel.set_pid_consts(50, 0.1, 1);
+    flywheel.init_pid_task();
+    flywheel.pause_pid_task();
+    // drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
+    drive.set_pid_straight_consts(100, 0, 0);
+    drive.set_pid_turn_consts(50, 0, 0);
+    drive.set_drivetrain_dimensions(15.75, 2, 1);
 }
 
 /**

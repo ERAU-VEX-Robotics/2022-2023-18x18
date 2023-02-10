@@ -1,3 +1,4 @@
+#include "externs.hpp"
 #include "main.h"
 
 /**
@@ -12,6 +13,9 @@
  * from where it left off.
  */
 void autonomous() {
+    flywheel.resume_pid_task();
+    drive.init_pid_task();
+
     switch (auton_id) {
     case test:
         break;
@@ -28,4 +32,7 @@ void autonomous() {
     default:
         break;
     }
+
+    drive.end_pid_task();
+    flywheel.pause_pid_task();
 }

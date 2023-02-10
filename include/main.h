@@ -41,6 +41,7 @@
  */
 // #include "okapi/api.hpp"
 // #include "pros/api_legacy.h"
+#include "externs.hpp"
 #include "gui.h"
 
 /**
