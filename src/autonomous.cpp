@@ -11,4 +11,21 @@
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+    switch (auton_id) {
+    case test:
+        break;
+    case skills_best:
+        break;
+    case skills_real:
+        break;
+    case match_best:
+        break;
+    case match_real:
+        break;
+    case none:
+        break;
+    default:
+        break;
+    }
+}
