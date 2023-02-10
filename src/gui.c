@@ -1,5 +1,9 @@
 #include "gui.h"
 #include "display/lv_core/lv_obj.h"
+#include "display/lv_core/lv_style.h"
+#include "display/lv_misc/lv_color.h"
+#include "display/lv_objx/lv_btn.h"
+#include "display/lv_objx/lv_btnm.h"
 #include "display/lv_objx/lv_label.h"
 #include "string.h"
 
@@ -12,6 +16,9 @@ lv_obj_t *btnm_auton_select;
 lv_obj_t *lbl;
 lv_style_t main_style;
 lv_style_t btn_style;
+lv_style_t btn_pr_style;
+lv_style_t btnm_btn_style;
+lv_style_t btnm_btn_pr_style;
 
 enum auton auton_id = none;
 
@@ -71,7 +78,18 @@ void gui_init() {
 
     btn_style.body.border.color = LV_COLOR_HEX(0xf8c649);
     btn_style.body.border.width = 2;
-    btn_style.body.radius = 30;
+    btn_style.body.radius = 40;
+
+    lv_style_copy(&btn_pr_style, &btn_style);
+    btn_pr_style.body.main_color = LV_COLOR_HEX(0x02101f);
+
+    lv_style_copy(&btnm_btn_style, &btn_style);
+    btnm_btn_style.body.border.width = 0;
+    btnm_btn_style.body.padding.inner = 5;
+
+    lv_style_copy(&btnm_btn_pr_style, &btn_pr_style);
+    btnm_btn_pr_style.body.border.width = 0;
+    btnm_btn_pr_style.body.padding.inner = 5;
 
     pg_main = lv_page_create(lv_scr_act(), NULL);
     lv_obj_set_size(pg_main, 480, 240);
@@ -89,6 +107,7 @@ void gui_init() {
     lv_btn_set_action(btn_main_to_auton, LV_BTN_ACTION_CLICK, show_auton_pg);
     lv_obj_align(btn_main_to_auton, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
     lv_btn_set_style(btn_main_to_auton, LV_BTN_STYLE_REL, &btn_style);
+    lv_btn_set_style(btn_main_to_auton, LV_BTN_STYLE_PR, &btn_pr_style);
 
     lbl = lv_label_create(btn_main_to_auton, NULL);
     lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -98,6 +117,7 @@ void gui_init() {
     lv_btn_set_action(btn_auton_to_main, LV_BTN_ACTION_CLICK, show_main_pg);
     lv_obj_align(btn_auton_to_main, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
     lv_btn_set_style(btn_auton_to_main, LV_BTN_STYLE_REL, &btn_style);
+    lv_btn_set_style(btn_auton_to_main, LV_BTN_STYLE_PR, &btn_pr_style);
 
     lbl = lv_label_create(btn_auton_to_main, NULL);
     lv_obj_align(lbl, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -106,7 +126,12 @@ void gui_init() {
     btnm_auton_select = lv_btnm_create(pg_auton, NULL);
     lv_btnm_set_map(btnm_auton_select, auton_display_map);
     lv_obj_align(btnm_auton_select, NULL, LV_ALIGN_CENTER, 40, 0);
-    lv_obj_set_size(btnm_auton_select, 300, 180);
+    lv_obj_set_size(btnm_auton_select, 310, 180);
+    lv_btnm_set_style(btnm_auton_select, LV_BTNM_STYLE_BG, &btn_style);
+    lv_btnm_set_style(btnm_auton_select, LV_BTNM_STYLE_BTN_REL,
+                      &btnm_btn_style);
+    lv_btnm_set_style(btnm_auton_select, LV_BTNM_STYLE_BTN_PR,
+                      &btnm_btn_pr_style);
 
     lv_btnm_set_action(btnm_auton_select, auton_select_action);
 
