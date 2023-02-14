@@ -1,10 +1,4 @@
 #include "gui.h"
-#include "display/lv_core/lv_obj.h"
-#include "display/lv_core/lv_style.h"
-#include "display/lv_misc/lv_color.h"
-#include "display/lv_objx/lv_btn.h"
-#include "display/lv_objx/lv_btnm.h"
-#include "display/lv_objx/lv_label.h"
 #include "string.h"
 
 // LVGL objects
