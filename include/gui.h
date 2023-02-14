@@ -1,7 +1,6 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include "gui.h"
 #include "pros/apix.h"
 
 #ifdef __cplusplus
