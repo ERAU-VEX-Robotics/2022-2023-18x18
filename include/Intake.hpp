@@ -55,14 +55,14 @@ class Intake {
                 pros::controller_digital_e_t in_top_button);
 
     // Wraps the necessary code to run the motors to collect disks
-    inline void in(void);
+    void in(void);
     // Wraps the necessary code to run the motors to expel disks from the intake
-    inline void out(void);
+    void out(void);
     // Wraps the necessary code to run only the top motors to push disks into
     // the flywheel
-    inline void in_top(void);
+    void in_top(void);
     // Stops the intake
-    inline void stop(void);
+    void stop(void);
 
     /**
      * Function: print_telemetry
