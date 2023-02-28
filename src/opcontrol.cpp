@@ -20,8 +20,7 @@ void opcontrol() {
                         pros::E_CONTROLLER_DIGITAL_B);
         drive.arcade_driver(pros::E_CONTROLLER_MASTER, false);
         intake.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_R1,
-                      pros::E_CONTROLLER_DIGITAL_L1,
-                      pros::E_CONTROLLER_DIGITAL_R2);
+                      pros::E_CONTROLLER_DIGITAL_L1);
         roller.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_UP,
                       pros::E_CONTROLLER_DIGITAL_DOWN);
         pros::delay(2);
