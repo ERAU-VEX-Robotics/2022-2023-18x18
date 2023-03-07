@@ -3,7 +3,7 @@
 Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
                  {true, false, true, false, true},
                  {false, true, false, true, false});
-Intake intake({3}, {false}, {4}, {true});
+Intake intake({4}, {false});
 Flywheel flywheel({14}, {true});
 Roller roller({1}, {true}, 2.0 / 5.0);
 
