@@ -5,7 +5,8 @@ Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
                  {false, true, false, true, false});
 Intake intake({4}, {false});
 Flywheel flywheel({14}, {true});
-Roller roller({1}, {true}, 2.0 / 5.0);
+Roller roller({1}, {true}, 1);
+Indexer indexer({3}, {false});
 
 /**
  * Runs initialization code.This occurs as soon as the program is started.
@@ -16,13 +17,15 @@ void initialize() {
     // GUI init
     gui_init();
 
-    flywheel.set_pid_consts(50, 0.1, 1);
-    flywheel.init_pid_task();
-    flywheel.pause_pid_task();
+    flywheel.set_speed_slow();
+    flywheel.init_task();
+    flywheel.pause_task();
+
     // drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
     drive.set_pid_straight_consts(100, 0, 0);
     drive.set_pid_turn_consts(50, 0, 0);
     drive.set_drivetrain_dimensions(15.75, 2, 1);
+    drive.set_settled_threshold(20);
 }
 
 /**
