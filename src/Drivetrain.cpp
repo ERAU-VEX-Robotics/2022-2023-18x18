@@ -1,7 +1,10 @@
 #include "Drivetrain.hpp"
 #include "pros/adi.h"
+#include "pros/misc.h"
 #include "pros/rtos.hpp"
+#include "stdio.h"
 #include "utils.h"
+#include <cmath>
 
 Drivetrain::Drivetrain(std::initializer_list<int> left_ports,
                        std::initializer_list<int> right_ports,
@@ -40,19 +43,20 @@ double Drivetrain::convert_inches_to_degrees(double inches) {
      * the rotation of the wheel is undercounted. Thus, multiplying by the gear
      * ratio accounts for this undermeasuring.
      */
-    return inches / tracking_wheel_radius * 180 / M_PI *
+    return inches / tracking_wheel_radius * 180 / 3.1415 *
            tracking_wheel_gear_ratio;
 }
 
 double Drivetrain::arc_len(double angle, double radius) {
     // The arc length formula, including converting the angle from degrees
-    return radius * angle * M_PI / 180;
+    return radius * angle * 3.1415 / 180;
 }
 
-void Drivetrain::add_adi_encoders(char left_encdr_top_port,
-                                  char left_encdr_bot_port, bool left_encdr_rev,
-                                  char right_encdr_top_port,
-                                  char right_encdr_bot_port,
+void Drivetrain::add_adi_encoders(uint8_t left_encdr_top_port,
+                                  uint8_t left_encdr_bot_port,
+                                  bool left_encdr_rev,
+                                  uint8_t right_encdr_top_port,
+                                  uint8_t right_encdr_bot_port,
                                   bool right_encdr_rev) {
     using_encdrs = true;
     left_encdr = pros::c::adi_encoder_init(left_encdr_top_port,
@@ -63,12 +67,6 @@ void Drivetrain::add_adi_encoders(char left_encdr_top_port,
 }
 
 void Drivetrain::pid_task_fn() {
-#ifdef D_DEBUG
-    printf("drive pid started\n");
-#endif
-#ifdef D_DEBUG
-    printf("drive pid started\n");
-#endif
     double left_integral = 0;
     double left_prev_error = 0;
     double left_error = 0;
@@ -77,7 +75,14 @@ void Drivetrain::pid_task_fn() {
     double right_prev_error = 0;
     double right_error = 0;
 
+    int count = 0;
+
     while (true) {
+        if (reset_integral) {
+            right_integral = 0;
+            left_integral = 0;
+            reset_integral = false;
+        }
         if (using_encdrs) {
             left_error = left_targ - pros::c::adi_encoder_get(left_encdr);
             right_error = right_targ - pros::c::adi_encoder_get(right_encdr);
@@ -87,14 +92,17 @@ void Drivetrain::pid_task_fn() {
         }
 
         if (fabs(left_error) < settled_threshold &&
-            fabs(right_error) < settled_threshold)
+            fabs(right_error) < settled_threshold) {
             is_settled = true;
-        else
+        } else
             is_settled = false;
 
         int left_voltage, right_voltage;
 
-        if (use_turn_consts) {
+        if (is_settled) {
+            left_voltage = 0;
+            right_voltage = 0;
+        } else if (use_turn_consts) {
             left_voltage = pid(kP_turn, kI_turn, kD_turn, left_error,
                                &left_integral, &left_prev_error);
             right_voltage = pid(kP_turn, kI_turn, kD_turn, right_error,
@@ -105,45 +113,29 @@ void Drivetrain::pid_task_fn() {
             right_voltage =
                 pid(kP_straight, kI_straight, kD_straight, right_error,
                     &right_integral, &right_prev_error);
-            right_voltage =
-                pid(kP_straight, kI_straight, kD_straight, right_error,
-                    &right_integral, &right_prev_error);
         }
 
         if (abs(left_voltage) > 12000)
             left_voltage = copysign(12000, left_voltage);
         if (abs(right_voltage) > 12000)
             right_voltage = copysign(12000, right_voltage);
-#ifdef D_DEBUG
-        printf("Left Error: %.2lf\nRight Error: %.2lf\n", left_error,
-               right_error);
-        print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
-                            E_MOTOR_GROUP_TELEM_PRINT_POSITION,
-                        E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
-                            E_MOTOR_GROUP_TELEM_PRINT_POSITION);
-
-#endif
-#ifdef D_DEBUG
-        printf("Left Error: %.2lf\nRight Error: %.2lf\n", left_error,
-               right_error);
-        print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
-                            E_MOTOR_GROUP_TELEM_PRINT_POSITION,
-                        E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
-                            E_MOTOR_GROUP_TELEM_PRINT_POSITION);
-
-#endif
-
         left_motors.move_voltage(left_voltage);
         right_motors.move_voltage(right_voltage);
+
+        if (left_error == left_prev_error && right_error == right_prev_error) {
+            ++count;
+        } else
+            count = 0;
+        if (count > 25) {
+            is_settled = true;
+        }
+
 #ifdef D_DEBUG
-        pros::delay(200);
-#else
-#ifdef D_DEBUG
-        pros::delay(200);
-#else
-        pros::delay(2);
+        printf("Left Error: %.2lf\nRight Error: %.2lf\nSettled: %d\n",
+               left_error, right_error, is_settled.load());
+
 #endif
-#endif
+        pros::delay(20);
     }
 }
 
@@ -162,46 +154,32 @@ void Drivetrain::set_pid_turn_consts(double Pconst, double Iconst,
 }
 
 void Drivetrain::move_straight(double inches) {
-    // Reset the encoder positions
-    if (using_encdrs) {
-        pros::c::adi_encoder_reset(left_encdr);
-        pros::c::adi_encoder_reset(right_encdr);
-    } else {
-        left_motors.reset_positions();
-        right_motors.reset_positions();
-    }
-
-    // Convert inches to degrees for the wheels to rotate
     double temp = convert_inches_to_degrees(inches);
+    use_turn_consts = false;
 
-    // Update targets
-    left_targ = temp;
-    right_targ = temp;
+    reset_pid_state(temp, temp);
 }
 
 void Drivetrain::turn_angle(double angle) {
-    // Reset the encoder positions
-    if (using_encdrs) {
-        pros::c::adi_encoder_reset(left_encdr);
-        pros::c::adi_encoder_reset(right_encdr);
-    } else {
-        left_motors.reset_positions();
-        right_motors.reset_positions();
-    }
+
     // Convert the angle to turn into degrees for the wheels to rotate
     // This consists of 2 parts. First, we turn the angle into the number of
     // inches each side needs to move. Then, we turn that into degrees
     double temp = convert_inches_to_degrees(arc_len(angle, track_distance));
+    use_turn_consts = true;
 
-    // Update targets
-    left_targ = temp;
-    right_targ = -temp;
+    reset_pid_state(-temp, temp);
 }
 
 void Drivetrain::init_pid_task() {
     pid_task =
         pros::c::task_create(trampoline, this, TASK_PRIORITY_DEFAULT,
                              TASK_STACK_DEPTH_DEFAULT, "Drivetrain PID Task");
+}
+
+void Drivetrain::set_velo(int left_velo, int right_velo) {
+    left_motors.move_velocity(left_velo);
+    right_motors.move_velocity(right_velo);
 }
 
 void Drivetrain::end_pid_task() {
@@ -211,8 +189,12 @@ void Drivetrain::end_pid_task() {
 }
 
 void Drivetrain::wait_until_settled() {
-    while (!is_settled)
-        pros::delay(20);
+    pros::delay(200);
+    while (!is_settled) {
+        printf("not settled\n");
+        pros::delay(2);
+    }
+    printf("settled\n");
 }
 void Drivetrain::set_settled_threshold(double threshold) {
     settled_threshold = threshold;
@@ -225,30 +207,54 @@ void Drivetrain::set_drivetrain_dimensions(double tw, double twr,
     tracking_wheel_gear_ratio = gear_ratio;
 }
 
-void Drivetrain::tank_driver(pros::controller_id_e_t controller) {
-    left_motors.move(pros::c::controller_get_analog(
-        controller, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-    right_motors.move(pros::c::controller_get_analog(
-        controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+void Drivetrain::tank_driver(pros::controller_id_e_t controller,
+                             pros::controller_digital_e_t rev_en_btn,
+                             pros::controller_digital_e_t rev_dis_btn) {
+
+    if (pros::c::controller_get_digital_new_press(controller, rev_en_btn))
+        rev_control = true;
+    else if (pros::c::controller_get_digital_new_press(controller, rev_dis_btn))
+        rev_control = false;
+
+    if (rev_control) {
+        right_motors.move(-pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+        left_motors.move(-pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+    } else {
+        left_motors.move(pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_LEFT_Y));
+        right_motors.move(pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+    }
 }
 
-void Drivetrain::arcade_driver(pros::controller_id_e_t controller,
-                               bool use_right) {
-    int power;
-    int turn;
-    if (use_right) {
-        power = pros::c::controller_get_analog(
-            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y);
-        turn = pros::c::controller_get_analog(
-            controller, pros::E_CONTROLLER_ANALOG_RIGHT_X);
-    } else {
-        power = pros::c::controller_get_analog(
+void Drivetrain::tank_driver_poly(pros::controller_id_e_t controller,
+                                  double pow,
+                                  pros::controller_digital_e_t rev_en_btn,
+                                  pros::controller_digital_e_t rev_dis_btn) {
+    int left, right;
+
+    if (pros::c::controller_get_digital_new_press(controller, rev_en_btn))
+        rev_control = true;
+    else if (pros::c::controller_get_digital_new_press(controller, rev_dis_btn))
+        rev_control = false;
+
+    if (rev_control) {
+        right = -pros::c::controller_get_analog(
             controller, pros::E_CONTROLLER_ANALOG_LEFT_Y);
-        turn = pros::c::controller_get_analog(controller,
-                                              pros::E_CONTROLLER_ANALOG_LEFT_X);
+        left = -pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+    } else {
+        left = pros::c::controller_get_analog(controller,
+                                              pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        right = pros::c::controller_get_analog(
+            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y);
     }
-    left_motors.move(power + turn);
-    right_motors.move(power - turn);
+    // We subtract 1 from pow since we multiply by the initial value - thus
+    // restoring the original range
+    left_motors.move(left * std::pow((std::abs(left) / 127.0), pow - 1));
+    right_motors.move(right * std::pow((std::abs(right) / 127.0), pow - 1));
 }
 
 void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {
@@ -263,4 +269,27 @@ void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {
     }
     printf("\n");
     printf("\n");
+}
+
+void Drivetrain::reset_pid_state(double new_left_targ, double new_right_targ) {
+    pros::c::task_suspend(pid_task);
+
+    reset_integral = true;
+
+    // Reset the encoder positions
+    if (using_encdrs) {
+        pros::c::adi_encoder_reset(left_encdr);
+        pros::c::adi_encoder_reset(right_encdr);
+    } else {
+        left_motors.reset_positions();
+        right_motors.reset_positions();
+    }
+
+    // Update targets
+    left_targ = new_left_targ;
+    right_targ = new_right_targ;
+
+    is_settled = false;
+
+    pros::c::task_resume(pid_task);
 }

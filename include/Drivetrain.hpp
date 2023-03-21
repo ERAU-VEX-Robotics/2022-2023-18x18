@@ -30,11 +30,6 @@ class Drivetrain {
     double settled_threshold = 10;
 
     // Variables tracking important information about the drivetrain
-    // track_distance: The distance from the center of the robot to the tracking
-    // wheels
-    // tracking_wheel_radius: The radius of the tracking wheels
-    // tracking_wheel_gear_ratio: The gear ratio from the tracking wheels to
-    // their encoders, defined as (gear on encoder) / (gear on wheel)
     double track_distance, tracking_wheel_radius, tracking_wheel_gear_ratio;
 
     // Atomic variables storing the PID controllers targets
@@ -58,6 +53,11 @@ class Drivetrain {
 
     // Boolean tracking whether the drivetrain includes encoders
     bool using_encdrs = false;
+
+    // Boolean tracking whether the tank control is set to reversed
+    bool rev_control = false;
+
+    bool reset_integral = false;
 
     /**
      * The PID task function. This function contains a loop that executes the
@@ -91,6 +91,8 @@ class Drivetrain {
      */
     inline double arc_len(double angle, double radius);
 
+    void reset_pid_state(double new_left_targ, double new_right_targ);
+
   public:
     /**
      * The Constructor for the Drivetrain Class
@@ -120,9 +122,10 @@ class Drivetrain {
      * This function initializes a pair of ADI (3 wire) shaft encoders for use
      * for the robot during the autonomous period. It also sets a flag to enable
      * use of the initialized encoders in the PID task*/
-    void add_adi_encoders(char left_encdr_top_port, char left_encdr_bot_port,
-                          bool left_encdr_rev, char right_encdr_top_port,
-                          char right_encdr_bot_port, bool right_encdr_rev);
+    void add_adi_encoders(uint8_t left_encdr_top_port,
+                          uint8_t left_encdr_bot_port, bool left_encdr_rev,
+                          uint8_t right_encdr_top_port,
+                          uint8_t right_encdr_bot_port, bool right_encdr_rev);
 
     /**
      * Function: tank_driver
@@ -134,25 +137,26 @@ class Drivetrain {
      * @param controller The Controller ID whose joystick to read the value
      * of
      */
-    void tank_driver(pros::controller_id_e_t controller);
+    void tank_driver(pros::controller_id_e_t controller,
+                     pros::controller_digital_e_t rev_en_btn,
+                     pros::controller_digital_e_t rev_dis_btn);
 
     /**
-     * Function: arcade_driver
+     * Function: tank_driver_poly
      *
-     * A driver control function in one joystick controls
-     * both forward/backward movement and turning.
+     * A driver control function in which each side of the drivetrain
+     * is controlled its respective joystick Y axis (i.e. the left
+     * joystick Y axis reading controls the left motors). This differs from
+     * tank_driver in that the input value is taken to the power input (and then
+     * readjusting them to the range of pros::motor::move: -127 to 127),
+     * creating a curve out of the input values
      *
-     * This implementation uses the left joystick by default
-     *
-     * The Y axis controls forward/backward
-     * The X axis controls turning
-     *
-     * @param controller The Controller ID whose joystick to read the value of
-     * @param use_right indicates whether or not to use the right joystick.
-     * Defaults to false
+     * @param controller The Controller ID whose joystick to read the value
+     * of
      */
-    void arcade_driver(pros::controller_id_e_t controller,
-                       bool use_right = false);
+    void tank_driver_poly(pros::controller_id_e_t controller, double pow,
+                          pros::controller_digital_e_t rev_en_btn,
+                          pros::controller_digital_e_t rev_dis_btn);
 
     /**
      * Functions to set the PID controller constants. Each controller uses the
@@ -181,8 +185,8 @@ class Drivetrain {
      * This function updates the values of the left and right PID targets to
      * make the robot turn by a given degree amount clockwise, from a bird's eye
      * view.
-     * @param inches  The number of degrees to turn clockwise. Negative values
-     *                indicate counterclockwise movement.
+     * @param angle The number of degrees to turn clockwise. Negative values
+     *              indicate counterclockwise movement.
      */
     void turn_angle(double angle);
 
@@ -200,6 +204,8 @@ class Drivetrain {
     // has reached its target position.
     void set_settled_threshold(double threshold);
 
+    void set_velo(int left_velo, int right_velo);
+
     /**
      * Function: set_drivetrain_dimensions
      * This function sets the values of various variables used in autonomous to
@@ -212,7 +218,7 @@ class Drivetrain {
                                  the same for both wheels
      * \param gear_ratio The gear ratio from the wheel to the device measuring
                          the rotation - should be calculated as (gear connected
-                         to encoder / gear connected to the wheel)
+                         to encoder) / (gear connected to the wheel)
      */
     void set_drivetrain_dimensions(double tracking_wheel_width,
                                    double tracking_wheel_rad,
