@@ -13,6 +13,6 @@
  * from where it left off.
  */
 void autonomous() {
-    flywheel.resume_pid_task();
-    flywheel.pause_pid_task();
+    flywheel.resume_task();
+    flywheel.pause_task();
 }
