@@ -17,10 +17,23 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+    flywheel.resume_task();
+    int voltage = 0;
+
     while (true) {
-        flywheel.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_A,
-                        pros::E_CONTROLLER_DIGITAL_B);
-        pros::delay(2);
+
+        flywheel.set_voltage(voltage);
+        pros::delay(1000);
+
+        flywheel.print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE |
+                                 E_MOTOR_GROUP_TELEM_PRINT_VELOCITY);
+
+        voltage += 50;
+
+        /*
+        flywheel.driver(pros::E_CONTROLLER_MASTER,
+        pros::E_CONTROLLER_DIGITAL_A, pros::E_CONTROLLER_DIGITAL_B);
+        */
     }
-    flywheel.end_pid_task();
+    flywheel.end_task();
 }
