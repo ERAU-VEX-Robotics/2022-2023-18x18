@@ -17,7 +17,7 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    flywheel.resume_task();
+    // flywheel.resume_task();
     int voltage = 0;
 
     while (true) {
