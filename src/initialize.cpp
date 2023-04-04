@@ -17,15 +17,16 @@ void initialize() {
     // GUI init
     gui_init();
 
-    flywheel.set_speed_slow();
-    flywheel.init_task();
-    flywheel.pause_task();
-
     // drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
     drive.set_pid_straight_consts(100, 0, 0);
     drive.set_pid_turn_consts(50, 0, 0);
     drive.set_drivetrain_dimensions(15.75, 2, 1);
     drive.set_settled_threshold(20);
+
+    flywheel.set_consts(2137, 22.0348, 0.5, 0);
+    flywheel.set_speed_slow();
+    flywheel.init_task();
+    flywheel.pause_task();
 }
 
 /**
