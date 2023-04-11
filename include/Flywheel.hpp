@@ -13,7 +13,7 @@
 #include <atomic>
 #include <initializer_list>
 
-#define FLYWHEEL_FAST_TARG 500
+#define FLYWHEEL_FAST_TARG 600
 #define FLYWHEEL_SLOW_TARG 400
 
 class Flywheel {
@@ -45,10 +45,10 @@ class Flywheel {
      * kV: multiplies the set velocity, "describes how much voltage is needed to
      * hold (or “cruise”) at a given constant velocity" (accounting for forces
      * against the mechanism's movement that increase as velocity increases)
-     * kA: Voltage needed to induce a given acceleration
      * kP: Direct multiplier on the current error
+     * kD: Multiplier on the difference between the previous and current error
      */
-    double kS, kV, kA, kP;
+    double kS, kV, kD, kP;
 
     // The PROS task type that contains the task for the flywheel
     pros::task_t task;
@@ -76,7 +76,7 @@ class Flywheel {
     Flywheel(std::initializer_list<int> ports,
              std::initializer_list<bool> reverses);
 
-    void set_consts(double kS, double kV, double kA, double kP);
+    void set_consts(double kS, double kV, double kP, double kD);
 
     void set_speed_slow();
     void set_speed_fast();

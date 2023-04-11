@@ -1,6 +1,4 @@
 #include "Indexer.hpp"
-#include "pros/misc.h"
-#include "pros/motors.h"
 
 #define INDEXER_VELO 60
 
@@ -16,7 +14,10 @@ void Indexer::set_rotation(int degrees_to_rotate) {
 }
 
 void Indexer::punch_disk() {
-    motors.move_relative(degrees_to_rotate, INDEXER_VELO);
+    motors.move_velocity(INDEXER_VELO);
+    pros::delay(1000);
+    motors.move(0);
+    pros::delay(100);
 }
 
 void Indexer::driver(pros::controller_id_e_t controller,
