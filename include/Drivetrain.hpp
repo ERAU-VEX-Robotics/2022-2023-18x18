@@ -24,7 +24,7 @@ class Drivetrain {
     Motor_Group left_motors, right_motors;
 
     // The Drivetrain's PID constants, both for moving straight and for turning
-    double kP_straight, kP_turn, kI_straight, kI_turn, kD_straight, kD_turn = 0;
+    double kP, kI, kD = 0;
 
     // The threshold for when to set is_settled to true, in degrees.
     double settled_threshold = 10;
@@ -43,9 +43,6 @@ class Drivetrain {
     // the robot with high precision.
     pros::c::adi_encoder_t left_encdr, right_encdr;
 
-    // Boolean tracking which PID constants to use
-    std::atomic<bool> use_turn_consts = false;
-
     // Boolean tracking whether the drivetrain PID has stopped. Used to
     // determine if the drivetrain has completed it's action during the
     // autonomous period.
@@ -57,7 +54,7 @@ class Drivetrain {
     // Boolean tracking whether the tank control is set to reversed
     bool rev_control = false;
 
-    bool reset_integral = false;
+    bool reset_pid_vars = false;
 
     /**
      * The PID task function. This function contains a loop that executes the
@@ -138,8 +135,7 @@ class Drivetrain {
      * of
      */
     void tank_driver(pros::controller_id_e_t controller,
-                     pros::controller_digital_e_t rev_en_btn,
-                     pros::controller_digital_e_t rev_dis_btn);
+                     pros::controller_digital_e_t rev_btn);
 
     /**
      * Function: tank_driver_poly
@@ -155,26 +151,7 @@ class Drivetrain {
      * of
      */
     void tank_driver_poly(pros::controller_id_e_t controller, double pow,
-                          pros::controller_digital_e_t rev_en_btn,
-                          pros::controller_digital_e_t rev_dis_btn);
-
-    /**
-     * Function: arcade_driver
-     *
-     * A driver control function in one joystick controls
-     * both forward/backward movement and turning.
-     *
-     * This implementation uses the left joystick by default
-     *
-     * The Y axis controls forward/backward
-     * The X axis controls turning
-     *
-     * @param controller The Controller ID whose joystick to read the value of
-     * @param use_right indicates whether or not to use the right joystick.
-     * Defaults to false
-     */
-    void arcade_driver(pros::controller_id_e_t controller,
-                       bool use_right = false);
+                          pros::controller_digital_e_t rev_btn);
 
     /**
      * Functions to set the PID controller constants. Each controller uses the
@@ -186,11 +163,10 @@ class Drivetrain {
      */
     // straight constants are used when the robot travels in a straight line,
     // while turn constants are used while turning
-    void set_pid_straight_consts(double Pconst, double Iconst, double Dconst);
-    void set_pid_turn_consts(double Pconst, double Iconst, double Dconst);
+    void set_pid_consts(double Pconst, double Iconst, double Dconst);
 
     /**
-     * Function: move_straight
+     * Function: move
      * This function updates the values of the left and right PID targets to
      * make the robot move forward a given number of inches.
      * @param inches  The number of inches to move forward. Negative values

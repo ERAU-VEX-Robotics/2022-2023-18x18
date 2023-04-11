@@ -1,9 +1,5 @@
 #include "Drivetrain.hpp"
-#include "pros/adi.h"
-#include "pros/misc.h"
-#include "pros/rtos.hpp"
 #include "stdio.h"
-#include "utils.h"
 #include <cmath>
 
 Drivetrain::Drivetrain(std::initializer_list<int> left_ports,
@@ -43,13 +39,13 @@ double Drivetrain::convert_inches_to_degrees(double inches) {
      * the rotation of the wheel is undercounted. Thus, multiplying by the gear
      * ratio accounts for this undermeasuring.
      */
-    return inches / tracking_wheel_radius * 180 / 3.1415 *
+    return inches / tracking_wheel_radius * 180 / 3.1415 /
            tracking_wheel_gear_ratio;
 }
 
 double Drivetrain::arc_len(double angle, double radius) {
     // The arc length formula, including converting the angle from degrees
-    return radius * angle * 3.1415 / 180;
+    return radius * angle * 3.1415 / 180.0;
 }
 
 void Drivetrain::add_adi_encoders(uint8_t left_encdr_top_port,
@@ -78,11 +74,6 @@ void Drivetrain::pid_task_fn() {
     int count = 0;
 
     while (true) {
-        if (reset_integral) {
-            right_integral = 0;
-            left_integral = 0;
-            reset_integral = false;
-        }
         if (using_encdrs) {
             left_error = left_targ - pros::c::adi_encoder_get(left_encdr);
             right_error = right_targ - pros::c::adi_encoder_get(right_encdr);
@@ -91,28 +82,51 @@ void Drivetrain::pid_task_fn() {
             right_error = right_targ - right_motors.get_avg_position();
         }
 
-        if (fabs(left_error) < settled_threshold &&
-            fabs(right_error) < settled_threshold) {
+        left_integral += left_error;
+        right_integral += right_error;
+
+        if (reset_pid_vars) {
+            left_integral = 0;
+            left_prev_error = 0;
+            left_error = 0;
+
+            right_integral = 0;
+            right_prev_error = 0;
+            right_error = 0;
+
+            is_settled = false;
+            reset_pid_vars = false;
+        } else if (fabs(left_error) < settled_threshold &&
+                   fabs(right_error) < settled_threshold) {
             is_settled = true;
         } else
             is_settled = false;
 
         int left_voltage, right_voltage;
 
+        if (left_error == left_prev_error && right_error == right_prev_error) {
+            ++count;
+        } else
+            count = 0;
+
+        if (count > 5) {
+            is_settled = true;
+            count = 0;
+        }
+
         if (is_settled) {
             left_voltage = 0;
             right_voltage = 0;
-        } else if (use_turn_consts) {
-            left_voltage = pid(kP_turn, kI_turn, kD_turn, left_error,
-                               &left_integral, &left_prev_error);
-            right_voltage = pid(kP_turn, kI_turn, kD_turn, right_error,
-                                &right_integral, &right_prev_error);
+            left_motors.brake();
+            right_motors.brake();
+            pros::delay(5);
+
+            continue;
         } else {
-            left_voltage = pid(kP_straight, kI_straight, kD_straight,
-                               left_error, &left_integral, &left_prev_error);
-            right_voltage =
-                pid(kP_straight, kI_straight, kD_straight, right_error,
-                    &right_integral, &right_prev_error);
+            left_voltage = left_error * kP + left_integral * kI +
+                           (left_error - left_prev_error) * kD;
+            right_voltage = right_error * kP + right_integral * kI +
+                            (right_error - right_prev_error) * kD;
         }
 
         if (abs(left_voltage) > 12000)
@@ -122,40 +136,26 @@ void Drivetrain::pid_task_fn() {
         left_motors.move_voltage(left_voltage);
         right_motors.move_voltage(right_voltage);
 
-        if (left_error == left_prev_error && right_error == right_prev_error) {
-            ++count;
-        } else
-            count = 0;
-        if (count > 25) {
-            is_settled = true;
-        }
-
 #ifdef D_DEBUG
         printf("Left Error: %.2lf\nRight Error: %.2lf\nSettled: %d\n",
                left_error, right_error, is_settled.load());
-
+        print_telemetry(E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE,
+                        E_MOTOR_GROUP_TELEM_PRINT_VOLTAGE);
 #endif
-        pros::delay(20);
+        left_prev_error = left_error;
+        right_prev_error = right_error;
+        pros::delay(2);
     }
 }
 
-void Drivetrain::set_pid_straight_consts(double Pconst, double Iconst,
-                                         double Dconst) {
-    kP_straight = Pconst;
-    kI_straight = Iconst;
-    kD_straight = Dconst;
-}
-
-void Drivetrain::set_pid_turn_consts(double Pconst, double Iconst,
-                                     double Dconst) {
-    kP_turn = Pconst;
-    kI_turn = Iconst;
-    kD_turn = Dconst;
+void Drivetrain::set_pid_consts(double Pconst, double Iconst, double Dconst) {
+    kP = Pconst;
+    kI = Iconst;
+    kD = Dconst;
 }
 
 void Drivetrain::move_straight(double inches) {
     double temp = convert_inches_to_degrees(inches);
-    use_turn_consts = false;
 
     reset_pid_state(temp, temp);
 }
@@ -166,9 +166,8 @@ void Drivetrain::turn_angle(double angle) {
     // This consists of 2 parts. First, we turn the angle into the number of
     // inches each side needs to move. Then, we turn that into degrees
     double temp = convert_inches_to_degrees(arc_len(angle, track_distance));
-    use_turn_consts = true;
 
-    reset_pid_state(-temp, temp);
+    reset_pid_state(temp, -temp);
 }
 
 void Drivetrain::init_pid_task() {
@@ -191,10 +190,9 @@ void Drivetrain::end_pid_task() {
 void Drivetrain::wait_until_settled() {
     pros::delay(200);
     while (!is_settled) {
-        printf("not settled\n");
         pros::delay(2);
     }
-    printf("settled\n");
+    pros::delay(200);
 }
 void Drivetrain::set_settled_threshold(double threshold) {
     settled_threshold = threshold;
@@ -208,13 +206,10 @@ void Drivetrain::set_drivetrain_dimensions(double tw, double twr,
 }
 
 void Drivetrain::tank_driver(pros::controller_id_e_t controller,
-                             pros::controller_digital_e_t rev_en_btn,
-                             pros::controller_digital_e_t rev_dis_btn) {
+                             pros::controller_digital_e_t rev_btn) {
 
-    if (pros::c::controller_get_digital_new_press(controller, rev_en_btn))
-        rev_control = true;
-    else if (pros::c::controller_get_digital_new_press(controller, rev_dis_btn))
-        rev_control = false;
+    if (pros::c::controller_get_digital_new_press(controller, rev_btn))
+        rev_control = !rev_control;
 
     if (rev_control) {
         right_motors.move(-pros::c::controller_get_analog(
@@ -231,14 +226,12 @@ void Drivetrain::tank_driver(pros::controller_id_e_t controller,
 
 void Drivetrain::tank_driver_poly(pros::controller_id_e_t controller,
                                   double pow,
-                                  pros::controller_digital_e_t rev_en_btn,
-                                  pros::controller_digital_e_t rev_dis_btn) {
+                                  pros::controller_digital_e_t rev_btn) {
+
     int left, right;
 
-    if (pros::c::controller_get_digital_new_press(controller, rev_en_btn))
-        rev_control = true;
-    else if (pros::c::controller_get_digital_new_press(controller, rev_dis_btn))
-        rev_control = false;
+    if (pros::c::controller_get_digital_new_press(controller, rev_btn))
+        rev_control = !rev_control;
 
     if (rev_control) {
         right = -pros::c::controller_get_analog(
@@ -257,26 +250,6 @@ void Drivetrain::tank_driver_poly(pros::controller_id_e_t controller,
     right_motors.move(right * std::pow((std::abs(right) / 127.0), pow - 1));
 }
 
-void Drivetrain::arcade_driver(pros::controller_id_e_t controller,
-                               bool use_right) {
-    int power;
-    int turn;
-    if (use_right) {
-        power = pros::c::controller_get_analog(
-            controller, pros::E_CONTROLLER_ANALOG_RIGHT_Y);
-        turn = pros::c::controller_get_analog(
-            controller, pros::E_CONTROLLER_ANALOG_RIGHT_X);
-    } else {
-        power = pros::c::controller_get_analog(
-            controller, pros::E_CONTROLLER_ANALOG_LEFT_Y);
-        turn = pros::c::controller_get_analog(controller,
-                                              pros::E_CONTROLLER_ANALOG_LEFT_X);
-    }
-    left_motors.move(power + turn);
-    right_motors.move(power - turn);
-}
-
-
 void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {
     if (left_vals) {
         printf("Left Motor Telemetry\n");
@@ -294,7 +267,7 @@ void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {
 void Drivetrain::reset_pid_state(double new_left_targ, double new_right_targ) {
     pros::c::task_suspend(pid_task);
 
-    reset_integral = true;
+    reset_pid_vars = true;
 
     // Reset the encoder positions
     if (using_encdrs) {
@@ -308,8 +281,6 @@ void Drivetrain::reset_pid_state(double new_left_targ, double new_right_targ) {
     // Update targets
     left_targ = new_left_targ;
     right_targ = new_right_targ;
-
-    is_settled = false;
 
     pros::c::task_resume(pid_task);
 }
