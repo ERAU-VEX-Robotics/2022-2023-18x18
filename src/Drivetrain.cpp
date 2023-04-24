@@ -117,8 +117,8 @@ void Drivetrain::pid_task_fn() {
         if (is_settled) {
             left_voltage = 0;
             right_voltage = 0;
-            left_motors.brake();
             right_motors.brake();
+            left_motors.brake();
             pros::delay(5);
 
             continue;
@@ -251,6 +251,7 @@ void Drivetrain::tank_driver_poly(pros::controller_id_e_t controller,
 }
 
 void Drivetrain::arcade_driver(pros::controller_id_e_t controller,
+                               pros::controller_digital_e_t rev_btn,
                                bool use_right) {
     int power;
     int turn;
@@ -265,8 +266,17 @@ void Drivetrain::arcade_driver(pros::controller_id_e_t controller,
         turn = pros::c::controller_get_analog(controller,
                                               pros::E_CONTROLLER_ANALOG_LEFT_X);
     }
-    left_motors.move(power + turn);
-    right_motors.move(power - turn);
+
+    if (pros::c::controller_get_digital_new_press(controller, rev_btn))
+        rev_control = !rev_control;
+
+    if (rev_control) {
+        left_motors.move(-power + turn);
+        right_motors.move(-power - turn);
+    } else {
+        left_motors.move(power + turn);
+        right_motors.move(power - turn);
+    }
 }
 
 void Drivetrain::print_telemetry(uint8_t left_vals, uint8_t right_vals) {

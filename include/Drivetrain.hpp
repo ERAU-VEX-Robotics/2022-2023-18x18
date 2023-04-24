@@ -169,6 +169,7 @@ class Drivetrain {
      * Defaults to false
      */
     void arcade_driver(pros::controller_id_e_t controller,
+                       pros::controller_digital_e_t rev_btn,
                        bool use_right = false);
 
     /**
