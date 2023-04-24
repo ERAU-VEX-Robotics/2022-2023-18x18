@@ -19,7 +19,19 @@ void autonomous() {
     // Drive PID tuning programs
     // Straight
     /*
+    drive.move_straight(72);
+    drive.wait_until_settled();
+
+    drive.move_straight(-60);
+    drive.wait_until_settled();
+
     drive.move_straight(48);
+    drive.wait_until_settled();
+
+    drive.move_straight(-36);
+    drive.wait_until_settled();
+
+    drive.move_straight(24);
     drive.wait_until_settled();
 
     drive.move_straight(-12);
@@ -28,7 +40,7 @@ void autonomous() {
     drive.move_straight(6);
     drive.wait_until_settled();
 
-    drive.move_straight(-24);
+    drive.move_straight(-3);
     drive.wait_until_settled();
     */
 
@@ -52,6 +64,46 @@ void autonomous() {
     drive.turn_angle(-30);
     drive.wait_until_settled();
     */
+
+    flywheel.set_target_velo(475);
+
+    drive.move_straight(-2);
+    drive.wait_until_settled();
+
+    pros::delay(250);
+    roller.clockwise(120);
+    pros::delay(250);
+
+    drive.move_straight(2);
+    drive.wait_until_settled();
+
+    drive.turn_angle(-15);
+    drive.wait_until_settled();
+
+    pros::delay(5000);
+
+    indexer.punch_disk();
+    pros::delay(200);
+    indexer.punch_disk();
+
+    drive.turn_angle(-125);
+    drive.wait_until_settled();
+
+    intake.in();
+    drive.move_straight(-30);
+    drive.wait_until_settled();
+
+    drive.move_straight(-3);
+    drive.wait_until_settled();
+
+    drive.move_straight(-3);
+    drive.wait_until_settled();
+
+    drive.move_straight(-3);
+    drive.wait_until_settled();
+
+    pros::delay(3000);
+    intake.stop();
 
     switch (auton_id) {
     case test:
