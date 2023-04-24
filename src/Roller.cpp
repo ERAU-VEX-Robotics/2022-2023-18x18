@@ -3,6 +3,7 @@
 Roller::Roller(std::initializer_list<int> ports,
                std::initializer_list<bool> revs, double gear_ratio)
     : motors(ports, revs), gear_ratio(gear_ratio) {
+    motors.set_gearing(pros::E_MOTOR_GEAR_RED);
     motors.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     motors.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
 }
@@ -14,7 +15,7 @@ void Roller::stop() { motors.move(0); }
 void Roller::clockwise(double degrees) {
     motors.reset_positions();
     double targ = degrees / gear_ratio;
-    motors.move_relative(targ, 200);
+    motors.move_relative(targ, 100);
     while (motors.get_avg_position() < (targ - 5))
         pros::delay(2);
     motors.brake();
@@ -23,7 +24,7 @@ void Roller::clockwise(double degrees) {
 void Roller::counterclockwise(double degrees) {
     motors.reset_positions();
     double targ = -degrees / gear_ratio;
-    motors.move_relative(targ, 200);
+    motors.move_relative(targ, 100);
     while (motors.get_avg_position() > (targ + 5))
         pros::delay(2);
     motors.brake();
