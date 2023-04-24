@@ -1,12 +1,11 @@
 #include "main.h"
 
-Drivetrain drive({20, 19, 18, 17, 16}, {10, 9, 8, 7, 6},
-                 {true, false, true, false, true},
-                 {false, true, false, true, false});
+Drivetrain drive({20, 18, 16}, {10, 8, 6}, {true, true, true},
+                 {false, false, false});
 Intake intake({4}, {false});
 Flywheel flywheel({14}, {true});
-Roller roller({1}, {true}, 1);
-Indexer indexer({3}, {false});
+Roller roller({1}, {false}, 36.0 / 60.0);
+Indexer indexer({3}, {true});
 
 /**
  * Runs initialization code.This occurs as soon as the program is started.
@@ -18,12 +17,11 @@ void initialize() {
     gui_init();
 
     // drive.add_adi_encoders('a', 'b', true, 'c', 'd', true);
-    drive.set_pid_straight_consts(100, 0, 0);
-    drive.set_pid_turn_consts(50, 0, 0);
-    drive.set_drivetrain_dimensions(15.75, 2, 1);
-    drive.set_settled_threshold(20);
+    drive.set_pid_consts(600, 0, 0);
+    drive.set_drivetrain_dimensions(12.5, 1.625, 36.0 / 60.0);
+    drive.set_settled_threshold(1);
 
-    flywheel.set_consts(2137, 22.0348, 0.5, 0);
+    flywheel.set_consts(1478, 19.4520, 2, 0);
     flywheel.set_speed_slow();
     flywheel.init_task();
     flywheel.pause_task();
