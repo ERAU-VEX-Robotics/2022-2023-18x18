@@ -13,7 +13,7 @@
 #include <atomic>
 #include <initializer_list>
 
-#define FLYWHEEL_FAST_TARG 600
+#define FLYWHEEL_FAST_TARG 500
 #define FLYWHEEL_SLOW_TARG 400
 
 class Flywheel {
