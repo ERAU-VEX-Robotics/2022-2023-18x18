@@ -14,11 +14,13 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+
     flywheel.resume_task();
     while (true) {
         flywheel.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_A,
                         pros::E_CONTROLLER_DIGITAL_B);
-        drive.arcade_driver(pros::E_CONTROLLER_MASTER, false);
+        drive.arcade_driver(pros::E_CONTROLLER_MASTER,
+                            pros::E_CONTROLLER_DIGITAL_RIGHT, false);
         intake.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_R1,
                       pros::E_CONTROLLER_DIGITAL_R2);
         roller.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_UP,
