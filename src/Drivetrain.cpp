@@ -176,6 +176,10 @@ void Drivetrain::init_pid_task() {
                              TASK_STACK_DEPTH_DEFAULT, "Drivetrain PID Task");
 }
 
+void Drivetrain::pause_pid_task() { pros::c::task_suspend(pid_task); }
+
+void Drivetrain::resume_pid_task() { pros::c::task_resume(pid_task); }
+
 void Drivetrain::set_velo(int left_velo, int right_velo) {
     left_motors.move_velocity(left_velo);
     right_motors.move_velocity(right_velo);
