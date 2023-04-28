@@ -20,11 +20,16 @@ void initialize() {
     drive.set_pid_consts(600, 0, 0);
     drive.set_drivetrain_dimensions(12.5, 1.625, 36.0 / 60.0);
     drive.set_settled_threshold(1);
+    drive.init_pid_task();
+    drive.pause_pid_task();
 
-    flywheel.set_consts(1478, 19.4520, 2, 0);
+    flywheel.set_consts(2000, 30, 0.01, 0);
     flywheel.set_speed_slow();
     flywheel.init_task();
     flywheel.pause_task();
+
+    // endgame expansion
+    pros::c::adi_port_set_config('a', pros::E_ADI_DIGITAL_OUT);
 }
 
 /**
@@ -32,7 +37,10 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+    drive.pause_pid_task();
+    flywheel.pause_task();
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field

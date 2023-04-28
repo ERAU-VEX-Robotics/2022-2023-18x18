@@ -14,6 +14,8 @@
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+    drive.pause_pid_task();
+    bool endgame_primed = false;
 
     flywheel.resume_task();
     while (true) {
@@ -27,7 +29,16 @@ void opcontrol() {
                       pros::E_CONTROLLER_DIGITAL_DOWN);
         indexer.driver(pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_L1,
                        pros::E_CONTROLLER_DIGITAL_L2);
+
+        if (pros::c::controller_get_digital_new_press(
+                pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_X))
+            endgame_primed = true;
+        if (pros::c::controller_get_digital_new_press(
+                pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_Y) &&
+            endgame_primed)
+            pros::c::adi_digital_write('a', true);
         pros::delay(2);
     }
     flywheel.end_task();
+    drive.pause_pid_task();
 }

@@ -14,7 +14,7 @@
  */
 void autonomous() {
     flywheel.resume_task();
-    drive.init_pid_task();
+    drive.resume_pid_task();
 
     // Drive PID tuning programs
     // Straight
@@ -65,7 +65,7 @@ void autonomous() {
     drive.wait_until_settled();
     */
 
-    flywheel.set_target_velo(475);
+    flywheel.set_target_velo(480);
 
     drive.move_straight(-2);
     drive.wait_until_settled();
@@ -83,27 +83,44 @@ void autonomous() {
     pros::delay(5000);
 
     indexer.punch_disk();
-    pros::delay(200);
+    pros::delay(500);
     indexer.punch_disk();
+    pros::delay(200);
+    flywheel.pause_task();
 
-    drive.turn_angle(-125);
+    drive.turn_angle(-130);
     drive.wait_until_settled();
 
     intake.in();
     drive.move_straight(-30);
     drive.wait_until_settled();
 
+    flywheel.resume_task();
+    flywheel.set_target_velo(475);
     drive.move_straight(-3);
     drive.wait_until_settled();
 
+    pros::delay(500);
+
     drive.move_straight(-3);
     drive.wait_until_settled();
+
+    pros::delay(500);
 
     drive.move_straight(-3);
     drive.wait_until_settled();
 
     pros::delay(3000);
     intake.stop();
+
+    drive.turn_angle(100);
+    drive.wait_until_settled();
+
+    indexer.punch_disk();
+    pros::delay(200);
+    indexer.punch_disk();
+    pros::delay(200);
+    indexer.punch_disk();
 
     switch (auton_id) {
     case test:
@@ -122,6 +139,5 @@ void autonomous() {
         break;
     }
 
-    drive.end_pid_task();
     flywheel.pause_task();
 }
