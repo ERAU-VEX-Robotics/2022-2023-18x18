@@ -1,7 +1,7 @@
 #include "Indexer.hpp"
 
 #define INDEXER_VELO 120
-#define INDEXER_ROTATION 360
+#define INDEXER_ROTATION 380
 
 Indexer::Indexer(std::initializer_list<int> ports,
                  std::initializer_list<bool> revs)
