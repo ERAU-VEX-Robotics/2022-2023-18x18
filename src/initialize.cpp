@@ -29,7 +29,7 @@ void initialize() {
     flywheel.pause_task();
 
     // endgame expansion
-    pros::c::adi_port_set_config('a', pros::E_ADI_DIGITAL_OUT);
+    pros::c::adi_port_set_config('d', pros::E_ADI_DIGITAL_OUT);
 }
 
 /**

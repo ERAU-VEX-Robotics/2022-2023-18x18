@@ -67,6 +67,7 @@ void autonomous() {
 
     flywheel.set_target_velo(480);
 
+    // Score roller
     drive.move_straight(-2);
     drive.wait_until_settled();
 
@@ -74,10 +75,11 @@ void autonomous() {
     roller.clockwise(120);
     pros::delay(250);
 
+    // Fire preloads
     drive.move_straight(2);
     drive.wait_until_settled();
 
-    drive.turn_angle(-15);
+    drive.turn_angle(-10);
     drive.wait_until_settled();
 
     pros::delay(5000);
@@ -88,6 +90,7 @@ void autonomous() {
     pros::delay(200);
     flywheel.pause_task();
 
+    // Pick up the stack of 3 in middle
     drive.turn_angle(-130);
     drive.wait_until_settled();
 
@@ -95,8 +98,10 @@ void autonomous() {
     drive.move_straight(-30);
     drive.wait_until_settled();
 
+    // Get flywheel ready for next fire
     flywheel.resume_task();
     flywheel.set_target_velo(475);
+
     drive.move_straight(-3);
     drive.wait_until_settled();
 
@@ -113,6 +118,7 @@ void autonomous() {
     pros::delay(3000);
     intake.stop();
 
+    // Fire the 3 disks
     drive.turn_angle(100);
     drive.wait_until_settled();
 

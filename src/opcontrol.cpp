@@ -36,7 +36,7 @@ void opcontrol() {
         if (pros::c::controller_get_digital_new_press(
                 pros::E_CONTROLLER_MASTER, pros::E_CONTROLLER_DIGITAL_Y) &&
             endgame_primed)
-            pros::c::adi_digital_write('a', true);
+            pros::c::adi_digital_write('d', true);
         pros::delay(2);
     }
     flywheel.end_task();

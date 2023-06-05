@@ -52,7 +52,7 @@ class Drivetrain {
     bool using_encdrs = false;
 
     // Boolean tracking whether the tank control is set to reversed
-    bool rev_control = false;
+    bool rev_control = true;
 
     bool reset_pid_vars = false;
 
